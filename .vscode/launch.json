@@ -13,6 +13,16 @@
             "env": {
                 "ENVIRONMENT_FILE": ".env.development"
             }
+        },
+        {
+            "name": "Python: Flask",
+            "type": "python",
+            "request": "launch",
+            "program": "index.py",
+            "console": "integratedTerminal",
+            "env": {
+                "ENVIRONMENT_FILE": ".env.development"
+            }
         }
     ]
 }
