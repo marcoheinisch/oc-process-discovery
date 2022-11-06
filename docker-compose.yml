@@ -4,7 +4,7 @@ services:
   clean-dash:
     build:
       context: .
-    image: clean-dash:$VERSION
+    image: clean-dash
     container_name: clean-dash
     ports:
       - "8084:8085"

@@ -1,5 +1,5 @@
 import dash_bootstrap_components as dbc
-import dash_html_components as html
+from dash import html
 
 from utils.constants import home_page_location, gdp_page_location, iris_page_location
 
