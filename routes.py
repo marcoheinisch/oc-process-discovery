@@ -4,21 +4,21 @@ from dash.dependencies import Input, Output
 
 from app import app
 
-from utils.constants import home_page_location, gdp_page_location, iris_page_location
+from utils.constants import home_page_location, dms_page_location, analyse_page_location
 
 from pages.home import home
-from pages.gdp import gdp
-from pages.iris import iris
+from pages.dms import dms
+from pages.analyse import analyse
 
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
     if pathname == home_page_location:
         return home.layout
-    elif pathname == gdp_page_location:
-        return gdp.layout
-    elif pathname == iris_page_location:
-        return iris.layout
+    elif pathname == dms_page_location:
+        return dms.layout
+    elif pathname == analyse_page_location:
+        return analyse.layout
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [

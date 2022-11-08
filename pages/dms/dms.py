@@ -1,11 +1,11 @@
 from dash import dcc
 from dash import html
 
-from pages.gdp.gdp_data import dataframe
+from pages.dms.dms_data import dataframe
 
 
 layout = html.Div([
-    html.H1("GDP viewer"),
+    html.H1("Data"),
     html.Hr(),
     dcc.Graph(id='graph-with-slider'),
     dcc.Slider(

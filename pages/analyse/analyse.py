@@ -2,7 +2,7 @@ import dash_bootstrap_components as dbc
 from dash import dcc
 from dash import html
 
-from pages.iris.iris_data import dataframe
+from pages.analyse.analyse_data import dataframe
 
 from components.table import make_dash_table
 
@@ -45,7 +45,7 @@ controls = dbc.Card(
 
 layout = dbc.Container(
     [
-        html.H1("Iris k-means clustering"),
+        html.H1("Analyse"),
         html.Hr(),
         dbc.Row(
             [

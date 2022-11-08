@@ -1,7 +1,7 @@
 import dash_bootstrap_components as dbc
 from dash import html
 
-from utils.constants import home_page_location, gdp_page_location, iris_page_location
+from utils.constants import home_page_location, dms_page_location, analyse_page_location
 
 
 # we use the Row and Col components to construct the sidebar header
@@ -64,8 +64,8 @@ sidebar = html.Div(
             dbc.Nav(
                 [
                     dbc.NavLink("Home", href=home_page_location, active="exact"),
-                    dbc.NavLink("GDP", href=gdp_page_location, active="exact"),
-                    dbc.NavLink("Iris", href=iris_page_location, active="exact"),
+                    dbc.NavLink("Data", href=dms_page_location, active="exact"),
+                    dbc.NavLink("Analyse", href=analyse_page_location, active="exact"),
                 ],
                 vertical=True,
                 pills=True,

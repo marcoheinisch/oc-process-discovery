@@ -7,7 +7,7 @@ import plotly.express as px
 from sklearn.cluster import KMeans
 
 from app import app
-from pages.iris.iris_data import dataframe
+from pages.analyse.analyse_data import dataframe
 
 
 @app.callback(
@@ -21,8 +21,8 @@ from pages.iris.iris_data import dataframe
 def make_graph(x, y, n_clusters):
     # minimal input validation, make sure there's at least one cluster
     km = KMeans(n_clusters=max(n_clusters, 1))
-    iris = dataframe()
-    df = iris.loc[:, [x, y]]
+    analyse = dataframe()
+    df = analyse.loc[:, [x, y]]
     km.fit(df.values)
     df["cluster"] = km.labels_
 
@@ -56,11 +56,11 @@ def make_graph(x, y, n_clusters):
 # make sure that x and y values can't be the same variable
 def filter_options(v):
     """Disable option v"""
-    iris = dataframe()
+    analyse = dataframe()
 
     return [
         {"label": col, "value": col, "disabled": col == v}
-        for col in iris.columns
+        for col in analyse.columns
     ]
 
 # functionality is the same for both dropdowns, so we reuse filter_options
