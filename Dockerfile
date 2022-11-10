@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM python:3.9
 
 WORKDIR /code
 
@@ -9,7 +9,7 @@ RUN pip install -r /requirements.txt \
 
 COPY ./ ./
 
-ENV ENVIRONMENT_FILE=".env"
+ENV ENVIRONMENT_FILE=".env.development"
 
 EXPOSE 8085
 
