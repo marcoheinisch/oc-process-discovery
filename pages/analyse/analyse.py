@@ -6,6 +6,8 @@ from pages.analyse.analyse_data import dataframe
 
 from components.table import make_dash_table
 
+from layout.processMining.sidebar import sidebar as pm_sidebar
+
 
 controls = dbc.Card(
     [
@@ -43,14 +45,14 @@ controls = dbc.Card(
     body=True,
 )
 
-layout = dbc.Container(
+container = dbc.Container(
     [
-        html.H1("Analyse"),
+        html.H1("Process Mining"),
         html.Hr(),
         dbc.Row(
             [
                 dbc.Col(controls, md=4),
-                dbc.Col(dcc.Graph(id="cluster-graph"), md=8),
+                dbc.Col(dcc.Graph(id="cluster-graph"), md=6),
             ],
             align="center",
         ),
@@ -62,3 +64,10 @@ layout = dbc.Container(
     ],
     fluid=True,
 )
+
+pm_page_content = html.Div(
+    container,
+    id="pm-page-content",
+)
+
+layout = html.Div([dcc.Location(id="pm-content"), pm_page_content, pm_sidebar])

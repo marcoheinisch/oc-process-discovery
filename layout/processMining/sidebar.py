@@ -8,19 +8,18 @@ from utils.constants import home_page_location, dms_page_location, analyse_page_
 # it consists of a title, and a toggle, the latter is hidden on large screens
 sidebar_header = dbc.Row(
     [
-        dbc.Col(html.H2("Sidebar", className="display-4")),
         dbc.Col(
             [
                 html.Button(
                     # use the Bootstrap navbar-toggler classes to style
-                    html.Span(className="navbar-light navbar-toggler-icon"),
+                    html.Span(className="navbar-dark navbar-toggler-icon"),
                     className="navbar-toggler",
                     # the navbar-toggler classes don't set color
                     style={
                         "color": "rgba(0,0,0,.5)",
                         "border-color": "rgba(0,0,0,.1)",
                     },
-                    id="sidebar-toggle",
+                    id="pm-sidebar-toggle",
                 ),
             ],
             # the column containing the toggle will be only as wide as the
@@ -28,6 +27,16 @@ sidebar_header = dbc.Row(
             width="auto",
             # vertically align the toggle in the center
             align="center",
+        ),
+        dbc.Col(
+            html.H2(
+                "Options",
+                className="display-4",
+                style={
+                    "color": "#f8f9fa",
+                    "text-align": "left",
+                },
+            )
         ),
     ]
 )
@@ -39,11 +48,20 @@ sidebar = html.Div(
         # hidden on a small screen
         html.Div(
             [
-                html.Hr(),
+                html.Hr(
+                    style={
+                        "border-top": "0.4rem solid white"
+                    },
+                    id="pm-hr"
+                ),
                 html.P(
                     "A responsive sidebar layout with collapsible navigation "
                     "links.",
                     className="lead",
+                    style={
+                        "color": "#f8f9fa",
+                    },
+                    id="pm-intro"
                 ),
             ],
             id="blurb",
@@ -59,8 +77,8 @@ sidebar = html.Div(
                 vertical=True,
                 pills=True,
             ),
-            id="collapse",
+            id="pm-collapse",
         ),
     ],
-    id="sidebar",
+    id="pm-sidebar",
 )
