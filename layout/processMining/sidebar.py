@@ -1,7 +1,10 @@
 import dash_bootstrap_components as dbc
 from dash import html
+from dash import dcc
 
 from utils.constants import home_page_location, dms_page_location, analyse_page_location
+
+from layout.processMining.apdas import apdas
 
 
 # we use the Row and Col components to construct the sidebar header
@@ -40,6 +43,30 @@ sidebar_header = dbc.Row(
         ),
     ]
 )
+options = dbc.Card(
+    [
+        dbc.Row(
+            [
+                dbc.Label(
+                    "Choose your process discovery algorithm:",
+                ),
+                dcc.Dropdown(
+                    id="apda-option",
+                    options=[
+                        {"label": row[0], "value": row[1]} for row in apdas
+                    ],
+                    value="AM",
+                    clearable=False,
+                    optionHeight=80,
+                    searchable=True,
+
+                ),
+            ],
+        ),
+    ],
+    body=True,
+    id="apda-dropdown",
+)
 
 sidebar = html.Div(
     [
@@ -50,7 +77,7 @@ sidebar = html.Div(
             [
                 html.Hr(
                     style={
-                        "border-top": "0.4rem solid white"
+                        "border-top": "solid white"
                     },
                     id="pm-hr"
                 ),
@@ -64,19 +91,11 @@ sidebar = html.Div(
                     id="pm-intro"
                 ),
             ],
-            id="blurb",
+            id="pm-blurb",
         ),
         # use the Collapse component to animate hiding / revealing links
         dbc.Collapse(
-            dbc.Nav(
-                [
-                    dbc.NavLink("Home", href=home_page_location, active="exact"),
-                    dbc.NavLink("Data", href=dms_page_location, active="exact"),
-                    dbc.NavLink("Analyse", href=analyse_page_location, active="exact"),
-                ],
-                vertical=True,
-                pills=True,
-            ),
+            options,
             id="pm-collapse",
         ),
     ],

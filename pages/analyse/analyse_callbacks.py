@@ -70,3 +70,14 @@ app.callback(Output("x-variable", "options"), [Input("y-variable", "value")])(
 app.callback(Output("y-variable", "options"), [Input("x-variable", "value")])(
     filter_options
 )
+
+@app.callback(
+    Output("process-model", "figure"),
+    [
+        Input("apda-option", "value"),
+    ],
+)
+
+def discover_process_model(apda):
+    # TODO
+    return None

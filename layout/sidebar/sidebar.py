@@ -39,7 +39,11 @@ sidebar = html.Div(
         # hidden on a small screen
         html.Div(
             [
-                html.Hr(),
+                html.Hr(
+                    style={
+                        "border-top": "solid hotpink"
+                    }
+                ),
                 html.P(
                     "A responsive sidebar layout with collapsible navigation "
                     "links.",
