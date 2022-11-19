@@ -1,0 +1,5 @@
+pynwrfc
+cython
+
+# Also needed: SAP NetWeaver RFC SDK
+#  - C:\nwrfcsdk is the default installation path for the SAP NetWeaver RFC SDK
