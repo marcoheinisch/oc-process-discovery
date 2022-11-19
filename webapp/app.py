@@ -14,7 +14,7 @@ server = flask.Flask(__name__) # define flask app.server
 app = dash.Dash(
     __name__,
     server=server,
-    suppress_callback_exceptions=True, 
+    suppress_callback_exceptions=True,
     external_stylesheets=[
         dbc.themes.BOOTSTRAP,
         FONT_AWSOME,
@@ -24,6 +24,10 @@ app = dash.Dash(
         {"name": "viewport", "content": "width=device-width, initial-scale=1"}
     ]
 )
+
+from webapp.pages.dms import dms
+
+dash.register_page("dsm", dms)
 
 cache = Cache(app.server, config={
     'CACHE_TYPE': 'filesystem',

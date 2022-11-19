@@ -2,7 +2,7 @@ import dash_bootstrap_components as dbc
 from dash import html
 from dash.dependencies import Input, Output
 
-from app import app
+from webapp.app import app
 
 from utils.constants import home_page_location, dms_page_location, analyse_page_location
 

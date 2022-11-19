@@ -1,6 +1,6 @@
 import pandas as pd
 
-from app import cache
+from webapp.app import cache
 from webapp.utils.constants import TIMEOUT
 
 

@@ -5,7 +5,7 @@ import plotly.graph_objs as go
 
 from sklearn.cluster import KMeans
 
-from app import app
+from webapp.app import app
 from webapp.pages.analyse.analyse_data import dataframe
 
 

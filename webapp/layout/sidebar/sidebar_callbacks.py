@@ -1,6 +1,6 @@
 from dash.dependencies import Input, Output, State
 
-from app import app
+from webapp.app import app
 
 
 @app.callback(

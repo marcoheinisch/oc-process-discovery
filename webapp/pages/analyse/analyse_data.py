@@ -2,7 +2,7 @@ import pandas as pd
 
 from sklearn import datasets
 
-from app import cache
+from webapp.app import cache
 from webapp.utils.constants import TIMEOUT
 
 

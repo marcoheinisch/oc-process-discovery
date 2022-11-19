@@ -3,7 +3,7 @@ from dash.dependencies import Input, Output
 
 import plotly.express as px
 
-from app import app
+from webapp.app import app
 from webapp.pages.dms.dms_data import dataframe
 
 

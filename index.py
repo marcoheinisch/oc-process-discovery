@@ -1,4 +1,4 @@
-from app import app
+from webapp.app import app
 
 from environment.settings import APP_HOST, APP_PORT, APP_DEBUG, DEV_TOOLS_PROPS_CHECK
 
