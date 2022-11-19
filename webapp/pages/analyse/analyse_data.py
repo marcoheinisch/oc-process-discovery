@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn import datasets
 
 from app import cache
-from utils.constants import TIMEOUT
+from webapp.utils.constants import TIMEOUT
 
 
 @cache.memoize(timeout=TIMEOUT)

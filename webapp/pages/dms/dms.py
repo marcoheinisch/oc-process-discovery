@@ -1,7 +1,7 @@
 from dash import dcc
 from dash import html
 
-from pages.dms.dms_data import dataframe
+from webapp.pages.dms.dms_data import dataframe
 
 
 layout = html.Div([

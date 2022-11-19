@@ -2,9 +2,9 @@ import dash_bootstrap_components as dbc
 from dash import dcc
 from dash import html
 
-from pages.analyse.analyse_data import dataframe
+from webapp.pages.analyse.analyse_data import dataframe
 
-from components.table import make_dash_table
+from webapp.components.table import make_dash_table
 
 
 controls = dbc.Card(

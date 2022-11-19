@@ -3,8 +3,8 @@ import dash_bootstrap_components as dbc
 
 from flask_caching import Cache
 
-from utils.external_assets import FONT_AWSOME, CUSTOM_STYLE
-from layout.layout import layout
+from webapp.utils.external_assets import FONT_AWSOME, CUSTOM_STYLE
+from webapp.layout.layout import layout
 
 import flask
 
@@ -27,7 +27,7 @@ app = dash.Dash(
 
 cache = Cache(app.server, config={
     'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': 'cache-directory'
+    'CACHE_DIR': 'webapp/cache-directory'
 })
 
 app.layout = layout

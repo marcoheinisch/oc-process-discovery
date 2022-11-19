@@ -4,7 +4,7 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 
 from app import app
-from pages.dms.dms_data import dataframe
+from webapp.pages.dms.dms_data import dataframe
 
 
 @app.callback(

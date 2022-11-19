@@ -1,6 +1,6 @@
 from dash import html
 
-from utils.functions import formatter_2_decimals
+from webapp.utils.functions import formatter_2_decimals
 
 
 def make_dash_table(df):

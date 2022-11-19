@@ -2,12 +2,11 @@
 from dash.dependencies import Input, Output
 
 import plotly.graph_objs as go
-import plotly.express as px
 
 from sklearn.cluster import KMeans
 
 from app import app
-from pages.analyse.analyse_data import dataframe
+from webapp.pages.analyse.analyse_data import dataframe
 
 
 @app.callback(
