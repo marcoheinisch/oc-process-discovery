@@ -9,6 +9,7 @@ from sklearn.cluster import KMeans
 from app import app
 from pages.analyse.analyse_data import dataframe
 
+from pages.analyse.process_discovery import ocpa_discover
 
 @app.callback(
     Output("cluster-graph", "figure"),
@@ -72,12 +73,12 @@ app.callback(Output("y-variable", "options"), [Input("x-variable", "value")])(
 )
 
 @app.callback(
-    Output("process-model", "figure"),
+    Output("process-model", "dot_source"),
     [
         Input("apda-option", "value"),
     ],
 )
 
 def discover_process_model(apda):
-    # TODO
-    return None
+    if apda == "ocpa":
+        return ocpa_discover()

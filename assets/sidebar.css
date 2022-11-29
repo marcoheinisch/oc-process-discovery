@@ -177,7 +177,6 @@
 
   #pm-page-content {
     margin-left: 2rem;
-    margin-right: 22rem;
     transition: margin-right 0.3s ease-in-out;
   }
 
@@ -192,4 +191,10 @@
     background-color: #f8f9fa;
     padding: 1rem 1rem;
   }
+}
+#process-model{
+  max-width: 80rem;
+  min-width: 0rem;
+}
+#process-model {
 }

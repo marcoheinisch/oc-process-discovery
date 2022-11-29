@@ -1,6 +1,4 @@
 apdas = [
-    ["alpha miner", "AM"],
-    ["split miner", "SM"],
-    ["heuristics miner", "HM"],
-    ["inductive miner", "IM"],
+    ["ocpa", "ocpa"],
+    ["pm4py", "pm4py"],
 ]
