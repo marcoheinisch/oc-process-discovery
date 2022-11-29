@@ -1,4 +1,10 @@
 {
+    "ocel:global-event": {
+        "ocel:activity": "__INVALID__"
+    },
+    "ocel:global-object": {
+        "ocel:type": "__INVALID__"
+    },
     "ocel:global-log": {
         "ocel:attribute-names": [],
         "ocel:object-types": [
