@@ -2,8 +2,7 @@ try:
     from pyrfc import Connection, ABAPApplicationError, ABAPRuntimeError, LogonError, CommunicationError
 except ImportError:
     print("You do not have pyrfc installed! You can not use the SAP Connector functionality!")
-import constants
-
+from environment.settings import SAP_CON_PARAMS
 
 class SapConnector:
     """Singleton SAP connector to connect to the SAP system with PYRFC"""
@@ -100,7 +99,7 @@ class SapConnector:
         return self.conn.call("STFC_CONNECTION")['RESPTEXT']
 
     def check_conn(user, password):
-        conn_params = constants.sap_conn_params
+        conn_params = SAP_CON_PARAMS
         conn_params['user'] = user
         conn_params['passwd'] = password
         try:
