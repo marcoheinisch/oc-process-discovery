@@ -11,7 +11,7 @@ from pm4py.objects.ocel.constants import OCEL_GLOBAL_EVENT
 
 def ocpa_discover():
     # delete those two lines later on (only for testing purposes until a proper ocel extraction and data management interfaces are in place
-    filename="data/resources/order_process.jsonocel"
+    filename="data/resources/sap.jsonocel"
     ocel = ocel_import_factory.apply(file_path=filename)
     ocpn = ocpn_discovery_factory.apply(ocel, parameters={"debug": False})
     ocpn_vis_factory.save(ocpn_vis_factory.apply(ocpn), "data/results/oc_petri_net_ocpa.png")
@@ -21,7 +21,7 @@ def ocpa_discover():
 def pm4py_discover():
     # delete those two lines later on (only for testing purposes until a proper ocel extraction and data management interfaces are in place
     print(1)
-    filename = "data/resources/order_process.jsonocel"
+    filename = "data/resources/sap.jsonocel"
     print(2)
     ocel = pm4py.read_ocel(file_path=filename)
     print(3)

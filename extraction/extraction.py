@@ -190,7 +190,7 @@ def get_tables_from_sap() -> dict[str, pd.DataFrame]:
 def extract_ocel():
     tables = get_tables_from_sap()
     log = extract_jsonocel_data(tables)
-    export_jsonocel(log)
+    export_jsonocel(log, file_path="data/resources/sap.jsonocel")
 
 
 if __name__ == "__main__":
