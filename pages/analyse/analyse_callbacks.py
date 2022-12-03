@@ -12,6 +12,7 @@ from pages.analyse.analyse_data import dataframe
 
 from pages.analyse.process_discovery import ocpa_discover
 from pages.analyse.process_discovery import pm4py_discover
+from pages.analyse.process_discovery import dfg_discover
 
 
 @app.callback(
@@ -27,3 +28,5 @@ def discover_process_model(apda):
         return ocpa_discover()
     elif apda == "pm4py":
         return pm4py_discover()
+    elif apda == "dfg":
+        return dfg_discover()

@@ -36,3 +36,14 @@ def pm4py_discover():
     dot = gviz.source
     print(8)
     return dot
+
+def dfg_discover():
+    # delete those two lines later on (only for testing purposes until a proper ocel extraction and data management interfaces are in place
+    filename = "data/resources/sap.jsonocel"
+    ocel = pm4py.read_ocel(file_path=filename)
+    ocpn = pm4py.discover_ocdfg(ocel)
+    pm4py.save_vis_ocdfg(ocpn, "data/results/oc_dfg_pm4py.png")
+    from pm4py.visualization.ocel.ocdfg import visualizer as ocdfg_visualizer
+    gviz = ocdfg_visualizer.apply(ocpn)
+    dot = gviz.source
+    return dot
