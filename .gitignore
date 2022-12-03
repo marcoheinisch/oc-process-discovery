@@ -130,5 +130,6 @@ dmypy.json
 .pyre/
 
 # pycharm
-.idea/
 /.idea/
+/.old/
+/.vscode/

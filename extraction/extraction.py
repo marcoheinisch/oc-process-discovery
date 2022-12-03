@@ -1,23 +1,12 @@
 """Provide Funktion for extraction of an jsonocel data from SAP tables dataframes."""
 import pandas as pd
 import json
-import os
 
-from utils.sap_con import SapConnector
 from utils import constants
+from utils.constants import VBTYP_DESCRIPTIONS
+from utils.sap_con import SapConnector
 from environment.settings import SAP_CON_PARAMS
 
-
-DOC_SEP = "@#@#@#"
-VBTYP_DESCRIPTIONS = {
-    "A": "Inquiry",
-    "B": "Quotation",
-    "C": "Order",
-    "Q": "WMS transfer order",
-    "R": "Goods movement",
-    "J": "Delivery",
-    "M": "Invoice"
-}
 
 
 def columns_astype_str(df, columns, regex: str = False):
@@ -37,6 +26,13 @@ def get_obj_and_types(df, obj_col, type_col) -> pd.DataFrame:
     objects.astype({"object_id": str, "object_type": str})
     objects.drop_duplicates(subset=['object_id'], inplace=True)
     return objects
+
+
+def add_object_ids_column(df, object_id_columns="object_id") -> pd.DataFrame:
+    """Function to add a "object_id" column."""
+    _df = df.copy()
+    _df['object_ids'] = _df[object_id_columns].astype(str).values.map(VBTYP_DESCRIPTIONS).tolist()
+    return _df
 
 
 def add_event_timestamp_column(df, date_column="ERDAT", time_column="ERZET", replace_columns=True) -> pd.DataFrame:
@@ -171,9 +167,8 @@ def export_jsonocel(log: dict, file_path: str = "log.jsonocel"):
         json.dump(log, f, default=json_serial, indent=4)
 
 
-def get_tables_from_sap() -> dict[str, pd.DataFrame]:
+def get_tables_from_sap(sap_con) -> dict[str, pd.DataFrame]:
     # Get SAP connection
-    sap_con = SapConnector.getInstance(SAP_CON_PARAMS)
     con_details = sap_con.get_con_details()
     print(con_details)
 
@@ -187,10 +182,25 @@ def get_tables_from_sap() -> dict[str, pd.DataFrame]:
     return tables
 
 
-def extract_ocel():
-    tables = get_tables_from_sap()
+def extract_ocel() -> str:
+    """Method used by 'extract' button at dms page (gui).
+    Returns: extraction status or error message."""
+    try:
+        from pyrfc import Connection, ABAPApplicationError, ABAPRuntimeError, LogonError, CommunicationError
+    except ImportError:
+        return "Application Error: PyRFC not installed"
+    try:
+        sap_con = SapConnector.getInstance(SAP_CON_PARAMS)
+    except CommunicationError:
+        return "Could not connect to server."
+    except LogonError:
+        return "Could not log in. Wrong credentials?"
+    except (ABAPApplicationError, ABAPRuntimeError):
+        return "An error occurred."
+    tables = get_tables_from_sap(sap_con)
     log = extract_jsonocel_data(tables)
     export_jsonocel(log, file_path="data/resources/sap.jsonocel")
+    return "Extraction successful."
 
 
 if __name__ == "__main__":

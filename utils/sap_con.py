@@ -10,7 +10,7 @@ class SapConnector:
 
     def getInstance(conn_params):
         """A function to return singleton SAP connection"""
-        if SapConnector.__instance == None:
+        if not (SapConnector.__instance != None):
             SapConnector(conn_params)
         return SapConnector.__instance
 
@@ -26,14 +26,8 @@ class SapConnector:
                 print("SAP connection successful")
 
             # Handle errors
-            except CommunicationError:
-                print("Could not connect to server.")
-                raise
-            except LogonError:
-                print("Could not log in. Wrong credentials?")
-                raise
-            except (ABAPApplicationError, ABAPRuntimeError):
-                print("An error occurred.")
+            except (CommunicationError, LogonError, ABAPApplicationError, ABAPRuntimeError) as error:
+                print(error)
                 raise
 
     def close_instance(self):

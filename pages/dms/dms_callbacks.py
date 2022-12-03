@@ -1,23 +1,17 @@
 
 from dash.dependencies import Input, Output
-
-import plotly.express as px
+from dash import html, ctx
 
 from app import app
-from pages.dms.dms_data import dataframe
+from extraction.extraction import extract_ocel
 
 
 @app.callback(
-    Output('graph-with-slider', 'figure'),
-    Input('year-slider', 'value'))
-def update_figure(selected_year):
-    dms_data = dataframe()
-    filtered_df = dms_data[dms_data.year == selected_year]
-
-    fig = px.scatter(filtered_df, x="gdpPercap", y="lifeExp",
-                     size="pop", color="continent", hover_name="country",
-                     log_x=True, size_max=55)
-
-    fig.update_layout(transition_duration=500)
-
-    return fig
+    Output('container-feedback-text', 'children'),
+    Input('btn-extract', 'n_clicks')
+)
+def extract_from_sap(btn1):
+    msg = ""
+    if 'btn-extract' == ctx.triggered_id:
+        msg = extract_ocel()
+    return html.Div(msg)
