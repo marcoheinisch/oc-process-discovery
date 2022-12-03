@@ -1,0 +1,246 @@
+{
+    "ocel:global-event": {
+        "ocel:activity": "__INVALID__"
+    },
+    "ocel:global-object": {
+        "ocel:type": "__INVALID__"
+    },
+    "ocel:global-log": {
+        "ocel:attribute-names": [],
+        "ocel:object-types": [
+            "A",
+            "B",
+            "C",
+            "J",
+            "M",
+            "Q",
+            "R"
+        ],
+        "ocel:version": [
+            "1.0"
+        ],
+        "ocel:ordering": [
+            "timestamp"
+        ]
+    },
+    "ocel:events": {
+        "14": {
+            "ocel:activity": "Create Quotation",
+            "ocel:timestamp": "2022-11-21T23:49:29",
+            "ocel:omap": [
+                "0010000000",
+                "0020000000"
+            ],
+            "ocel:vmap": {}
+        },
+        "13": {
+            "ocel:activity": "Create Quotation",
+            "ocel:timestamp": "2022-11-21T23:49:29",
+            "ocel:omap": [
+                "0010000000",
+                "0020000000"
+            ],
+            "ocel:vmap": {}
+        },
+        "12": {
+            "ocel:activity": "Create Quotation",
+            "ocel:timestamp": "2022-11-21T23:49:29",
+            "ocel:omap": [
+                "0010000000",
+                "0020000000"
+            ],
+            "ocel:vmap": {}
+        },
+        "15": {
+            "ocel:activity": "Create Order",
+            "ocel:timestamp": "2022-11-29T15:09:57",
+            "ocel:omap": [
+                "0010000000",
+                "0000000006"
+            ],
+            "ocel:vmap": {}
+        },
+        "16": {
+            "ocel:activity": "Create Order",
+            "ocel:timestamp": "2022-11-29T15:09:57",
+            "ocel:omap": [
+                "0010000000",
+                "0000000006"
+            ],
+            "ocel:vmap": {}
+        },
+        "17": {
+            "ocel:activity": "Create Order",
+            "ocel:timestamp": "2022-11-29T15:09:57",
+            "ocel:omap": [
+                "0020000000",
+                "0000000006"
+            ],
+            "ocel:vmap": {}
+        },
+        "18": {
+            "ocel:activity": "Create Order",
+            "ocel:timestamp": "2022-11-29T15:09:57",
+            "ocel:omap": [
+                "0020000000",
+                "0000000006"
+            ],
+            "ocel:vmap": {}
+        },
+        "19": {
+            "ocel:activity": "Create Order",
+            "ocel:timestamp": "2022-11-29T15:09:57",
+            "ocel:omap": [
+                "0020000000",
+                "0000000006"
+            ],
+            "ocel:vmap": {}
+        },
+        "20": {
+            "ocel:activity": "Create Delivery",
+            "ocel:timestamp": "2022-11-29T15:22:15",
+            "ocel:omap": [
+                "0000000006",
+                "0080000003"
+            ],
+            "ocel:vmap": {}
+        },
+        "21": {
+            "ocel:activity": "Create Delivery",
+            "ocel:timestamp": "2022-11-29T15:22:15",
+            "ocel:omap": [
+                "0000000006",
+                "0080000003"
+            ],
+            "ocel:vmap": {}
+        },
+        "22": {
+            "ocel:activity": "Create Delivery",
+            "ocel:timestamp": "2022-11-29T15:22:15",
+            "ocel:omap": [
+                "0010000000",
+                "0080000003"
+            ],
+            "ocel:vmap": {}
+        },
+        "23": {
+            "ocel:activity": "Create Delivery",
+            "ocel:timestamp": "2022-11-29T15:22:15",
+            "ocel:omap": [
+                "0010000000",
+                "0080000003"
+            ],
+            "ocel:vmap": {}
+        },
+        "24": {
+            "ocel:activity": "Create Delivery",
+            "ocel:timestamp": "2022-11-29T15:22:15",
+            "ocel:omap": [
+                "0020000000",
+                "0080000003"
+            ],
+            "ocel:vmap": {}
+        },
+        "25": {
+            "ocel:activity": "Create Delivery",
+            "ocel:timestamp": "2022-11-29T15:22:15",
+            "ocel:omap": [
+                "0020000000",
+                "0080000003"
+            ],
+            "ocel:vmap": {}
+        },
+        "26": {
+            "ocel:activity": "Create WMS transfer order",
+            "ocel:timestamp": "2022-11-29T15:28:49",
+            "ocel:omap": [
+                "0080000003",
+                "20221129"
+            ],
+            "ocel:vmap": {}
+        },
+        "27": {
+            "ocel:activity": "Create WMS transfer order",
+            "ocel:timestamp": "2022-11-29T15:28:49",
+            "ocel:omap": [
+                "0080000003",
+                "20221129"
+            ],
+            "ocel:vmap": {}
+        }
+    },
+    "ocel:objects": {
+        "0080000000": {
+            "ocel:type": "J",
+            "ocel:ovmap": {}
+        },
+        "0080000001": {
+            "ocel:type": "J",
+            "ocel:ovmap": {}
+        },
+        "0080000002": {
+            "ocel:type": "J",
+            "ocel:ovmap": {}
+        },
+        "0090000002": {
+            "ocel:type": "M",
+            "ocel:ovmap": {}
+        },
+        "0090000001": {
+            "ocel:type": "M",
+            "ocel:ovmap": {}
+        },
+        "0090000000": {
+            "ocel:type": "M",
+            "ocel:ovmap": {}
+        },
+        "20160527": {
+            "ocel:type": "Q",
+            "ocel:ovmap": {}
+        },
+        "4900002053": {
+            "ocel:type": "R",
+            "ocel:ovmap": {}
+        },
+        "4900002054": {
+            "ocel:type": "R",
+            "ocel:ovmap": {}
+        },
+        "4900002055": {
+            "ocel:type": "R",
+            "ocel:ovmap": {}
+        },
+        "0020000000": {
+            "ocel:type": "B",
+            "ocel:ovmap": {}
+        },
+        "0000000006": {
+            "ocel:type": "C",
+            "ocel:ovmap": {}
+        },
+        "0080000003": {
+            "ocel:type": "J",
+            "ocel:ovmap": {}
+        },
+        "20221129": {
+            "ocel:type": "Q",
+            "ocel:ovmap": {}
+        },
+        "0000000001": {
+            "ocel:type": "C",
+            "ocel:ovmap": {}
+        },
+        "0000000002": {
+            "ocel:type": "C",
+            "ocel:ovmap": {}
+        },
+        "0000000003": {
+            "ocel:type": "C",
+            "ocel:ovmap": {}
+        },
+        "0010000000": {
+            "ocel:type": "A",
+            "ocel:ovmap": {}
+        }
+    }
+}
