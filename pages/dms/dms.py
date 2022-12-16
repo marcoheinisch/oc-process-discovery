@@ -7,3 +7,4 @@ layout = html.Div([
     html.Button('Extract from SAP', id='btn-extract', n_clicks=0),
     html.Div(id='container-feedback-text')
 ])
+
