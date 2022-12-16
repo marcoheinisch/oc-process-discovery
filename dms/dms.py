@@ -7,17 +7,8 @@ class SingletonClass(object):
 singleton = SingletonClass()
 
 class DataManagementSystem():
-<<<<<<< Updated upstream
-  def store_in_dms(data):
-    SingletonClass.singleton = data
-
-  def load_from_dms():
-    return SingletonClass.singleton
-
-=======
   def store(data):
     SingletonClass.singleton = data
 
   def load():
     return SingletonClass.singleton
->>>>>>> Stashed changes
