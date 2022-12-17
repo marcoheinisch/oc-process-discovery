@@ -8,13 +8,12 @@ from utils.sap_con import SapConnector
 from environment.settings import SAP_CON_PARAMS
 
 
-
-def columns_astype_str(df, columns, regex: str = False):
+def columns_astype_str(df, columns, regex: str = ""):
     """Convert columns of a dataframe to string."""
     _df = df.copy()
     for column in columns:
         _df[column] = _df[column].astype(str)
-        if regex:
+        if regex != "":
             _df[column] = _df[column].str.replace(regex, '')
     return _df
 
@@ -28,10 +27,10 @@ def get_obj_and_types(df, obj_col, type_col) -> pd.DataFrame:
     return objects
 
 
-def add_object_ids_column(df, object_id_columns="object_id") -> pd.DataFrame:
+def add_object_ids_column(df, from_columns: list = ["VBELV", "VBELN"]) -> pd.DataFrame:
     """Function to add a "object_id" column."""
     _df = df.copy()
-    _df['object_ids'] = _df[object_id_columns].astype(str).values.map(VBTYP_DESCRIPTIONS).tolist()
+    _df['object_ids'] = _df[from_columns].values.tolist()    
     return _df
 
 
@@ -121,9 +120,9 @@ def extract_jsonocel_data(tables):
     vbfa = columns_astype_str(vbfa, columns=['VBELN', 'VBELV', 'VBTYP_N', 'VBTYP_V'], regex='[^a-zA-Z0-9]')
 
     vbfa = add_event_timestamp_column(vbfa)
+    vbfa = add_object_ids_column(vbfa, from_columns=["VBELV", "VBELN"])
     vbfa = add_event_activity_column(vbfa, activity_column="VBTYP_N", activity_value_prefix="Create ",
                                      replace_columns=False)
-    vbfa['object_ids'] = vbfa[["VBELV", "VBELN"]].values.tolist()
 
     events_vbfa = vbfa
 
@@ -133,22 +132,35 @@ def extract_jsonocel_data(tables):
     objects_vbfa = pd.concat([objects_vbfa_n, objects_vbfa_v])
     objects_vbfa.drop_duplicates(inplace=True)
 
-    # 2.1
-    # vbak = tables["VBAK"]
-    # vbak = vbak[['VBELN', 'ERDAT', 'ERZET']]  # todo: remove/move to constants
-    #
-    # events_vbak = pd.DataFrame()
-    # objects_vbak = pd.DataFrame()
+    # ???
+    vbak = tables["VBAK"]
+    
+    vbfa_vbeln = vbfa['VBELN'].unique()
+    df = vbfa[~vbfa['VBELV'].isin(vbfa_vbeln)]
+    df = df[['VBELV', 'VBTYP_V']].rename(columns={'VBELV': 'VBELN', 'VBTYP_V': 'VBTYP_N'})
+    df = vbak.merge(df.drop_duplicates(), on='VBELN', how='left', indicator=True)
+    events_vbak = df[df['_merge'] == 'both']
+    
+    events_vbak = add_event_timestamp_column(events_vbak)
+    events_vbak = add_object_ids_column(events_vbak, from_columns=["VBELN"])
+    events_vbak = add_event_activity_column(events_vbak, activity_column="VBTYP_N", activity_value_prefix="Create ",replace_columns=False)
+    
+    objects_vbak = get_obj_and_types(events_vbak, obj_col="VBELN", type_col="VBTYP_N")
+
+    # 2.1 Get all events changing a document loged in CDHDR and CDPOS
+    cdpos = tables["CDPOS"]
+    cdhdr = tables["CDHDR"]
+
 
     # Generate jsonocel
-    events = events_vbfa  # pd.concat([events_vbfa, events_vbak])
+    events = pd.concat([events_vbfa, events_vbak])
     events = events.sort_values("event_timestamp")
     events = add_event_id_column(events)
     events = columns_astype_str(events, list(events.columns.drop(["event_timestamp", "object_ids"])))
     events = events[events["event_timestamp"] > pd.to_datetime("20190101123000", format="%Y%m%d%H%M%S")]
     events.type = "succint"
 
-    objects = objects_vbfa  # pd.concat([objects_vbfa, objects_vbak])
+    objects = pd.concat([objects_vbfa, objects_vbak])
 
     log_dict = construct_ocel_dict(events, objects)
     return log_dict
