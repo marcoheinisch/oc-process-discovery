@@ -3,7 +3,7 @@ import pandas as pd
 import json
 
 from utils import constants
-from utils.constants import VBTYP_DESCRIPTIONS
+from utils.constants import VBTYP_DESCRIPTIONS, OBJECTCLAS_DESCRIPTIONS
 from utils.sap_con import SapConnector
 from environment.settings import SAP_CON_PARAMS
 
@@ -159,18 +159,27 @@ def extract_jsonocel_data(tables):
     objects_bsad = get_obj_and_types(events_bsad, obj_col="VBELN", type_col="VBTYP_N")
 
     # 4 Get all events changing a document loged in CDHDR and CDPOS
-    cdpos = tables["CDPOS"]
+    #cdpos = tables["CDPOS"]
     cdhdr = tables["CDHDR"]
+    cdhdr = columns_astype_str(cdhdr, columns=['OBJECTCLAS', 'OBJECTID', 'UDATE', 'UTIME'], regex='[^a-zA-Z0-9]')
+    cdhdr = cdhdr[cdhdr['OBJECTCLAS'].isin(["LIEFERUNG", "VERKBELEG"])]
+    cdhdr['OBJECTCLAS'] = cdhdr['OBJECTCLAS'].apply(lambda x: OBJECTCLAS_DESCRIPTIONS[x] if x in OBJECTCLAS_DESCRIPTIONS else x)
+    cdhdr = add_event_timestamp_column(cdhdr, date_column="UDATE", time_column="UTIME")
+    cdhdr = add_object_ids_column(cdhdr, from_columns=[ "OBJECTID"]) #"AUGBL",
+    cdhdr = add_event_activity_column(cdhdr, activity_column="OBJECTCLAS", activity_value_prefix="Update ",
+                                        replace_columns=False)
+    events_cdhdr = cdhdr
+    objects_cdhdr = get_obj_and_types(events_cdhdr, obj_col="OBJECTID", type_col="OBJECTCLAS")
 
     # Generate jsonocel
-    events = pd.concat([events_vbfa, events_vbak, events_bsad])
+    events = pd.concat([events_vbfa, events_vbak, events_bsad, events_cdhdr])
     events = events.sort_values("event_timestamp")
     events = add_event_id_column(events)
     events = columns_astype_str(events, list(events.columns.drop(["event_timestamp", "object_ids"])))
     events = events[events["event_timestamp"] > pd.to_datetime("20220101123000", format="%Y%m%d%H%M%S")]
     events.type = "succint"
 
-    objects = pd.concat([objects_vbfa, objects_vbak, objects_bsad])
+    objects = pd.concat([objects_vbfa, objects_vbak, objects_bsad, objects_cdhdr])
 
     log_dict = construct_ocel_dict(events, objects)
     return log_dict
