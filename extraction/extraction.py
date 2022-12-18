@@ -21,6 +21,7 @@ def columns_astype_str(df, columns, regex: str = ""):
 def get_obj_and_types(df, obj_col, type_col) -> pd.DataFrame:
     """Returns pd.DataFrame with object_id and object_type columns."""
     objects = df[[obj_col, type_col]].copy()
+    objects[type_col] = objects[type_col].apply(lambda x: VBTYP_DESCRIPTIONS[x] if x in VBTYP_DESCRIPTIONS else x)
     objects.rename(columns={obj_col: "object_id", type_col: "object_type"}, inplace=True)
     objects.astype({"object_id": str, "object_type": str})
     objects.drop_duplicates(subset=['object_id'], inplace=True)
@@ -41,7 +42,9 @@ def add_event_timestamp_column(df, date_column="ERDAT", time_column="ERZET", rep
     _df["event_timestamp"] = _df[date_column].astype(str) + _df[time_column].astype(str)
     _df["event_timestamp"] = pd.to_datetime(_df["event_timestamp"], format="%Y%m%d%H%M%S")
     if replace_columns:
-        _df.drop(["ERDAT", "ERZET"], axis=1, inplace=True)
+        _df.drop([date_column, time_column], axis=1, inplace=True)
+    
+    _df = _df[_df["event_timestamp"] > pd.to_datetime("20220101123000", format="%Y%m%d%H%M%S")]
     return _df
 
 
@@ -116,8 +119,8 @@ def extract_jsonocel_data(tables):
 
     # 1.1 Get all events creating a new document in VBFA
     vbfa = tables["VBFA"]
-    vbfa = vbfa[['ERDAT', 'ERZET', 'VBELN', 'VBELV', 'VBTYP_N', 'VBTYP_V']]  # todo: remove/move to constants
-    vbfa = columns_astype_str(vbfa, columns=['VBELN', 'VBELV', 'VBTYP_N', 'VBTYP_V'], regex='[^a-zA-Z0-9]')
+    vbfa = vbfa[['ERDAT', 'ERZET', 'VBELN', 'VBELV', 'VBTYP_N', 'VBTYP_V', "POSNN", "POSNV"]]  # todo: remove/move to constants
+    vbfa = columns_astype_str(vbfa, columns=['VBELN', 'VBELV', 'VBTYP_N', 'VBTYP_V', "POSNN", "POSNV"], regex='[^a-zA-Z0-9]')
 
     vbfa = add_event_timestamp_column(vbfa)
     vbfa = add_object_ids_column(vbfa, from_columns=["VBELV", "VBELN"])
@@ -132,7 +135,7 @@ def extract_jsonocel_data(tables):
     objects_vbfa = pd.concat([objects_vbfa_n, objects_vbfa_v])
     objects_vbfa.drop_duplicates(inplace=True)
 
-    # ???
+    # 2 Get Initial Inquirys
     vbak = tables["VBAK"]
     
     vbfa_vbeln = vbfa['VBELN'].unique()
@@ -157,7 +160,7 @@ def extract_jsonocel_data(tables):
     events = events.sort_values("event_timestamp")
     events = add_event_id_column(events)
     events = columns_astype_str(events, list(events.columns.drop(["event_timestamp", "object_ids"])))
-    events = events[events["event_timestamp"] > pd.to_datetime("20190101123000", format="%Y%m%d%H%M%S")]
+    events = events[events["event_timestamp"] > pd.to_datetime("20220101123000", format="%Y%m%d%H%M%S")]
     events.type = "succint"
 
     objects = pd.concat([objects_vbfa, objects_vbak])
