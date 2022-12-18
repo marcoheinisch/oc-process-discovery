@@ -4,6 +4,7 @@ import os
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import math
 import pm4py
 from pm4py.objects.ocel.obj import OCEL
 
@@ -134,11 +135,17 @@ def update_event_attribute_positive_flag(value):
 def update_object_attribute_checkboxes(keys):
     checkboxes = []
     for key in keys:
+        s = set(get_ocel().objects[key])
+        elements = sorted(set(filter(lambda x: not math.isnan(x), s)))
+        # for x in s:
+        #     if math.isnan(x):
+        #         elements.append(x)
+        #         break
         checkboxes.append(html.Div(
             children=[
                 dcc.Checklist(
                     id=f'{key}-checklist',
-                    options=[{'label': element, 'value': element} for element in sorted(set(get_ocel().objects[key]))],
+                    options=[{'label': element, 'value': element} for element in elements],
                     value=[]
                 )
             ]
@@ -196,6 +203,9 @@ app.layout = html.Div(
         event_attribute_dropdown,
         event_attribute_checkboxes,
         event_attribute_positive_radio,
+        object_attribute_dropdown,
+        object_attribute_checkboxes,
+        object_attribute_positive_radio,
         html.Button('Rollback', id='rollback-button')
     ],
     id='filtering_panel'
