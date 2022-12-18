@@ -66,8 +66,30 @@ event_attribute_checkboxes = html.Div(
 # create radio buttons for setting "Positive" flag
 event_attribute_positive_radio = dcc.RadioItems(
     id='event-attribute-positive-radio',
-    options=[{'label': 'positive', 'value': 'True'}, {'label': 'negative', 'value': 'False'}],
-    value='True',  # default value
+    options=[{'label': 'positive', 'value': True}, {'label': 'negative', 'value': False}],
+    value=True,  # default value
+    labelStyle={'display': 'inline-block'}
+)
+
+# Filter on Object Attributes
+object_attribute_dropdown = dcc.Dropdown(
+    id='object-attribute-dropdown',
+    options=[{'label': attr, 'value': attr} for attr in get_ocel().objects.columns.tolist()],
+    value=[],
+    multi=True
+)
+
+# create checkboxes for selecting elements
+object_attribute_checkboxes = html.Div(
+    id='object-attribute-checkboxes',
+    children=[]
+)
+
+# create radio buttons for setting "Positive" flag
+object_attribute_positive_radio = dcc.RadioItems(
+    id='object-attribute-positive-radio',
+    options=[{'label': 'positive', 'value': True}, {'label': 'negative', 'value': False}],
+    value=True,  # default value
     labelStyle={'display': 'inline-block'}
 )
 
@@ -103,6 +125,34 @@ def update_event_attribute_positive_flag(value):
     return value
 
 
+# Filter on Object Attributes callbacks
+# define callback for updating element checkboxes
+@app.callback(
+    Output('object-attribute-checkboxes', 'children'),
+    [Input('object-attribute-dropdown', 'value')]
+)
+def update_object_attribute_checkboxes(keys):
+    checkboxes = []
+    for key in keys:
+        checkboxes.append(html.Div(
+            children=[
+                dcc.Checklist(
+                    id=f'{key}-checklist',
+                    options=[{'label': element, 'value': element} for element in sorted(set(get_ocel().objects[key]))],
+                    value=[]
+                )
+            ]
+        ))
+    return checkboxes
+
+
+# define callback for updating "Positive" flag
+@app.callback(
+    Output('object-attribute-positive-flag', 'children'),
+    [Input('object-attribute-positive-radio', 'value')]
+)
+def update_object_attribute_positive_flag(value):
+    return value
 
 
 
@@ -117,6 +167,9 @@ def update_event_attribute_positive_flag(value):
         Output('event_attribute_dropdown', 'value'),
         Output('event-attribute-checkboxes', 'value'),
         Output('event-attribute-positive-radio', 'value'),
+        Output('object_attribute_dropdown', 'value'),
+        Output('object-attribute-checkboxes', 'value'),
+        Output('object-attribute-positive-radio', 'value'),
     ],
     Input('rollback-button', 'n_clicks')
 )
@@ -134,7 +187,7 @@ def rollback(n_clicks):
     ocel = pm4py.read_ocel(get_path())
 
     # reset filtering options to default values
-    return None, None, None
+    return [], [], True, [], [], True
 
 
 # create layout
