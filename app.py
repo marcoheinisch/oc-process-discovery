@@ -1,20 +1,28 @@
 import dash
 import dash_bootstrap_components as dbc
-#from dash.long_callback import DiskcacheLongCallbackManager
+import diskcache
 from flask_caching import Cache
+from dash import DiskcacheManager
 
 from utils.external_assets import FONT_AWSOME, CUSTOM_STYLE
 from layout.layout import layout
+from uuid import uuid4
 
 import flask
 
 
 server = flask.Flask(__name__) # define flask app.server
 
+callback_cache = diskcache.Cache("./cache-directory/callback_cache")
+background_callback_manager = DiskcacheManager(
+    callback_cache, cache_by=[lambda: uuid4()], expire=60
+)
+
 app = dash.Dash(
     __name__,
     server=server,
-    suppress_callback_exceptions=False,
+    suppress_callback_exceptions=True,
+    background_callback_manager=background_callback_manager,
     external_stylesheets=[
         dbc.themes.BOOTSTRAP,
         FONT_AWSOME,
@@ -30,7 +38,6 @@ cache = Cache(app.server, config={
     'CACHE_DIR': 'cache-directory'
 })
 
-#long_callback_manager = DiskcacheLongCallbackManager(cache)
 
 app.layout = layout
 

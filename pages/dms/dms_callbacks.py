@@ -1,17 +1,23 @@
 
 from dash.dependencies import Input, Output
 from dash import html, ctx
+import time
 
 from app import app
 from extraction.extraction import extract_ocel
 
 
 @app.callback(
-    Output('container-feedback-text', 'children'),
-    Input('btn-extract', 'n_clicks')
+    prevent_initial_call=True,
+    output=Output("paragraph_id", "children"),
+    inputs=Input("button_id", "n_clicks"),
+    background=True,
+    running=[
+        (Output("button_id", "children"), "...", "Extract from SAP"),
+    ],
+    cancel=[Input("cancel_button_id", "n_clicks")],
 )
-def extract_from_sap(btn1):
+def update_clicks(n_clicks):
     msg = ""
-    if 'btn-extract' == ctx.triggered_id:
-        msg = extract_ocel()
-    return html.Div(msg)
+    msg = extract_ocel()
+    return [msg]

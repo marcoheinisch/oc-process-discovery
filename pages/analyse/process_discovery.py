@@ -1,6 +1,12 @@
-from ocpa.objects.log.importer.ocel import factory as ocel_import_factory
-from ocpa.algo.discovery.ocpn import algorithm as ocpn_discovery_factory
-from ocpa.visualization.oc_petri_net import factory as ocpn_vis_factory
+import warnings
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from ocpa.objects.log.importer.ocel import factory as ocel_import_factory
+    from ocpa.algo.discovery.ocpn import algorithm as ocpn_discovery_factory
+    from ocpa.visualization.oc_petri_net import factory as ocpn_vis_factory
+    from pm4py.visualization.ocel.ocpn import visualizer as ocpn_visualizer
+    from pm4py.visualization.ocel.ocdfg import visualizer as ocdfg_visualizer
 
 import pm4py
 from pm4py.util import constants
@@ -29,7 +35,6 @@ def pm4py_discover():
     print(4)
     pm4py.save_vis_ocpn(ocpn, "data/results/oc_petri_net_pm4py.png")
     print(5)
-    from pm4py.visualization.ocel.ocpn import visualizer as ocpn_visualizer
     print(6)
     gviz = ocpn_visualizer.apply(ocpn)
     print(7)
@@ -43,7 +48,6 @@ def dfg_discover():
     ocel = pm4py.read_ocel(file_path=filename)
     ocpn = pm4py.discover_ocdfg(ocel)
     pm4py.save_vis_ocdfg(ocpn, "data/results/oc_dfg_pm4py.png")
-    from pm4py.visualization.ocel.ocdfg import visualizer as ocdfg_visualizer
     gviz = ocdfg_visualizer.apply(ocpn)
     dot = gviz.source
     return dot
