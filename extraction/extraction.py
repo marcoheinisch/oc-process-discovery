@@ -126,7 +126,6 @@ def extract_jsonocel_data(tables):
     vbfa = add_object_ids_column(vbfa, from_columns=["VBELV", "VBELN"])
     vbfa = add_event_activity_column(vbfa, activity_column="VBTYP_N", activity_value_prefix="Create ",
                                      replace_columns=False)
-
     events_vbfa = vbfa
 
     # 1.2 Get all objects and their object type from the events in VBFa:
@@ -137,7 +136,6 @@ def extract_jsonocel_data(tables):
 
     # 2 Get Initial Inquirys
     vbak = tables["VBAK"]
-    
     vbfa_vbeln = vbfa['VBELN'].unique()
     df = vbfa[~vbfa['VBELV'].isin(vbfa_vbeln)]
     df = df[['VBELV', 'VBTYP_V']].rename(columns={'VBELV': 'VBELN', 'VBTYP_V': 'VBTYP_N'})
@@ -150,20 +148,35 @@ def extract_jsonocel_data(tables):
     
     objects_vbak = get_obj_and_types(events_vbak, obj_col="VBELN", type_col="VBTYP_N")
 
-    # 2.1 Get all events changing a document loged in CDHDR and CDPOS
+    # 3 Get Cleared-Invoice events. These lines costed me a weekned of work. Kinda sad;)
+    bsad = tables["BSAD"]
+    bsad.replace('', pd.NA).dropna(subset=["VBELN"])
+    bsad = columns_astype_str(bsad, columns=['VBELN', 'AUGDT'], regex='[^a-zA-Z0-9]')
+    bsad['ERZET'] = "235959"
+    bsad['VBTYP_N'] = "Cleared Invoice"
+    bsad = add_event_timestamp_column(bsad, date_column="AUGDT", time_column="ERZET")
+    bsad = add_object_ids_column(bsad, from_columns=[ "VBELN"]) #"AUGBL",
+    bsad = add_event_activity_column(bsad, activity_column="VBTYP_N", activity_value_prefix="",
+                                     replace_columns=False)
+    events_bsad = bsad
+    objects_bsad = get_obj_and_types(events_bsad, obj_col="VBELN", type_col="VBTYP_N")
+
+    
+    
+    # 4 Get all events changing a document loged in CDHDR and CDPOS
     cdpos = tables["CDPOS"]
     cdhdr = tables["CDHDR"]
 
 
     # Generate jsonocel
-    events = pd.concat([events_vbfa, events_vbak])
+    events = pd.concat([events_vbfa, events_vbak, events_bsad])
     events = events.sort_values("event_timestamp")
     events = add_event_id_column(events)
     events = columns_astype_str(events, list(events.columns.drop(["event_timestamp", "object_ids"])))
     events = events[events["event_timestamp"] > pd.to_datetime("20220101123000", format="%Y%m%d%H%M%S")]
     events.type = "succint"
 
-    objects = pd.concat([objects_vbfa, objects_vbak])
+    objects = pd.concat([objects_vbfa, objects_vbak, objects_bsad])
 
     log_dict = construct_ocel_dict(events, objects)
     return log_dict
