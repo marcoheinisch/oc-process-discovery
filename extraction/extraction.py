@@ -137,16 +137,13 @@ def extract_jsonocel_data(tables):
     # 2 Get Initial Inquirys
     vbak = tables["VBAK"]
     vbfa_vbeln = vbfa['VBELN'].unique()
-    df = vbfa[~vbfa['VBELV'].isin(vbfa_vbeln)]
-    df = df[['VBELV', 'VBTYP_V']].rename(columns={'VBELV': 'VBELN', 'VBTYP_V': 'VBTYP_N'})
-    df = vbak.merge(df.drop_duplicates(), on='VBELN', how='left', indicator=True)
-    events_vbak = df[df['_merge'] == 'both']
-    
+    vbfa = vbfa[~vbfa['VBELV'].isin(vbfa_vbeln)] 
+    vbfa = vbfa[['VBELV', 'VBTYP_V']].groupby('VBELV').first().reset_index() # all unique VBELV not occuring in VBELN of the whole vbfa table
+    events_vbak = pd.merge(left=vbak, right=vbfa, left_on='VBELN', right_on='VBELV', how='right', suffixes=('_vbak', '_vbfa'))
     events_vbak = add_event_timestamp_column(events_vbak)
     events_vbak = add_object_ids_column(events_vbak, from_columns=["VBELN"])
-    events_vbak = add_event_activity_column(events_vbak, activity_column="VBTYP_N", activity_value_prefix="Create ",replace_columns=False)
-    
-    objects_vbak = get_obj_and_types(events_vbak, obj_col="VBELN", type_col="VBTYP_N")
+    events_vbak = add_event_activity_column(events_vbak, activity_column="VBTYP_V", activity_value_prefix="Create ",replace_columns=False)
+    objects_vbak = get_obj_and_types(events_vbak, obj_col="VBELV", type_col="VBTYP_V")
 
     # 3 Get Cleared-Invoice events. These lines costed me a weekned of work. Kinda sad;)
     bsad = tables["BSAD"]
@@ -161,12 +158,9 @@ def extract_jsonocel_data(tables):
     events_bsad = bsad
     objects_bsad = get_obj_and_types(events_bsad, obj_col="VBELN", type_col="VBTYP_N")
 
-    
-    
     # 4 Get all events changing a document loged in CDHDR and CDPOS
     cdpos = tables["CDPOS"]
     cdhdr = tables["CDHDR"]
-
 
     # Generate jsonocel
     events = pd.concat([events_vbfa, events_vbak, events_bsad])
