@@ -53,7 +53,7 @@ def add_event_activity_column(df, activity_column="VBTYP_N", activity_value_pref
     """Function to add a "event_activity" column."""
     _df = df.copy()
     # _df[activity_column] = _df[activity_column].str.replace('[^a-zA-Z0-9]', '')  moved to columns_astype_str
-    _df["event_activity"] = activity_value_prefix + _df[activity_column].map(VBTYP_DESCRIPTIONS).astype(str)
+    _df["event_activity"] = activity_value_prefix + _df[activity_column].apply(lambda x: VBTYP_DESCRIPTIONS[x] if x in VBTYP_DESCRIPTIONS else x).astype(str)
     if replace_columns:
         _df.drop([activity_column], axis=1, inplace=True)
     return _df
@@ -200,8 +200,7 @@ def export_jsonocel(log: dict, file_path: str = "log.jsonocel"):
 
 def get_tables_from_sap(sap_con) -> dict[str, pd.DataFrame]:
     # Get SAP connection
-    con_details = sap_con.get_con_details()
-    print(con_details)
+
 
     tables = {}
     for table, fields in constants.tables.items():
