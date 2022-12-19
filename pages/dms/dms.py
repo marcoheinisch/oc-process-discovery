@@ -1,10 +1,10 @@
 from datetime import date
-from dash import Dash, dcc, html
+from dash import Dash, dcc, html, ctx
 from dash.dependencies import Input, Output, State
 
 from app import log_management
 from app import app
-import base64
+from extraction.extraction import extract_ocel
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -55,7 +55,7 @@ layout = html.Div([
     
     # Data management component
     html.Div([
-        html.H6("View and delete files"),
+        html.H6("View and select File for analysis"),
         html.Div(
             html.Div([
                 html.Div(html.B("Your files")),
@@ -69,6 +69,8 @@ layout = html.Div([
             style={'color': 'grey', 'height': '300px', 'width': '300%', 'display': 'flex', 'justify-content': 'left'}),
         ], style={'width': '33%', 'display': 'inline-block', 'vertical-align': 'top', 'padding': '10px'}),
     ])
+
+
     
 
 
@@ -96,9 +98,10 @@ def select_checklist_options(value):
 
 #list of uploaded files
 @app.callback(Output('uploaded-files-checklist', 'options'),
+              Input('container-feedback-text', 'children'),
               [Input('output-jsonocel-upload', 'children')],
               [State('uploaded-files-checklist', 'options')])
-def update_checklist_options(children, existing_options):
+def update_checklist_options(v, children, existing_options):
     options = log_management.all_keys()
     if options is None:
         options = []
@@ -122,6 +125,16 @@ def download_selected_files(n_clicks, selected_files):
 #delete selected files
 """@app.callback("""
 
+
+@app.callback(
+    Output('container-feedback-text', 'children'),
+    Input('btn-extract', 'n_clicks')
+)
+def extract_from_sap(btn1):
+    msg = ""
+    if 'btn-extract' == ctx.triggered_id:
+        msg = extract_ocel()
+    return html.Div(msg)
 
 if __name__ == '__main__': #only run if this file is called directly
     app.run_server(debug=True) #enables debug mode
