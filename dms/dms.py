@@ -7,6 +7,7 @@ class SingletonClass(object):
             cls.instance = super(SingletonClass, cls).__new__(cls)
             # Initialize the data attribute as an empty dictionary
             cls.instance.data = {}
+            cls.instance.selected = None
         # Return the existing instance of the class
         return cls.instance
 
@@ -17,12 +18,34 @@ class DataManagementSystem:
         singleton_instance = SingletonClass()
         # Store the data in the data attribute of the singleton instance
         singleton_instance.data[key] = contents
-
+        
     @classmethod
     def load(cls, key):
         # Get the single instance of the SingletonClass object
         singleton_instance = SingletonClass()
         # Retrieve the data from the data attribute of the singleton instance
         return singleton_instance.data.get(key)
+    
+    @classmethod
+    def delete(cls, key):
+        # Get the single instance of the SingletonClass object
+        singleton_instance = SingletonClass()
+        # Retrieve the data from the data attribute of the singleton instance
+        if key in singleton_instance.data:
+            del singleton_instance.data[key]
+        else:
+            raise Warning("Key not found in DataManagement. Cannot delete.")
+        
+    @classmethod
+    def select(cls, key):
+        singleton_instance = SingletonClass()
+        singleton_instance.selected = key
+        
+    @classmethod
+    def all_keys(cls):
+        # Get the single instance of the SingletonClass object
+        singleton_instance = SingletonClass()
+        # Retrieve the data from the data attribute of the singleton instance
+        return list(singleton_instance.data.keys())
 
 

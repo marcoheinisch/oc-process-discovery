@@ -3,6 +3,7 @@ import dash_bootstrap_components as dbc
 
 from flask_caching import Cache
 
+from dms.dms import DataManagementSystem
 from utils.external_assets import FONT_AWSOME, CUSTOM_STYLE
 from layout.layout import layout
 
@@ -29,6 +30,8 @@ cache = Cache(app.server, config={
     'CACHE_TYPE': 'filesystem',
     'CACHE_DIR': 'cache-directory'
 })
+
+log_management = DataManagementSystem()
 
 app.layout = layout
 

@@ -1,7 +1,8 @@
 from datetime import date
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output, State
-from dms.dms import DataManagementSystem
+
+from app import log_management
 from app import app
 import base64
 
@@ -56,17 +57,16 @@ layout = html.Div([
     html.Div([
         html.H6("View and delete files"),
         html.Div(
-             html.Div([
-            html.Div(html.B("Your files")),
-            dcc.Checklist(id='uploaded-files-checklist', options=[]),
-            # Delete button
-            html.Button(id='delete-file-button', children='Delete'),
-            # Download button
-           html.Button("Download", id="download-button", n_clicks=0),
-           dcc.Download(id="download-file")
-        ], style={'width': '25%', 'display': 'inline-block'}),
-        style={'color': 'grey', 'height': '300px', 'width': '300%', 'display': 'flex', 'justify-content': 'left'}),
-        
+            html.Div([
+                html.Div(html.B("Your files")),
+                dcc.RadioItems(id='uploaded-files-checklist', options=[]),
+                # Delete button
+                html.Button(id='delete-file-button', children='Delete'),
+                # Download button
+                html.Button("Download", id="download-button", n_clicks=0),
+                dcc.Download(id="download-file")
+            ], style={'width': '25%', 'display': 'inline-block'}),
+            style={'color': 'grey', 'height': '300px', 'width': '300%', 'display': 'flex', 'justify-content': 'left'}),
         ], style={'width': '33%', 'display': 'inline-block', 'vertical-align': 'top', 'padding': '10px'}),
     ])
     
@@ -77,41 +77,48 @@ layout = html.Div([
               [Input('upload-jsonocel', 'contents')],
               [State('upload-jsonocel', 'filename'),
                State('upload-jsonocel', 'last_modified')])
-#store the contents of an uploaded file and display a message indicating the file was successfully uploaded
+#store the contents of an uploaded file(s) and display a message indicating the file(s) was successfully uploaded
 def parse_contents(contents, filename, date): #date is not used yet
-    DataManagementSystem.store('filename', contents)
+    if contents is None:
+        return "None"
+    for i in range(len(contents)):
+        log_management.store(filename[i], contents[i])
     return html.Div([
         'File {} successfully uploaded'.format(filename)
     ])
 
-
+# Callback function to mark a file for the analysis
+@app.callback(Output('uploaded-files-checklist', 'children'), 
+              [Input('uploaded-files-checklist', 'value')])
+def select_checklist_options(value):
+    log_management.select(value)
+    return 'You have selected "{}" for analysis'.format(value)
 
 #list of uploaded files
 @app.callback(Output('uploaded-files-checklist', 'options'),
-              [Input('upload-jsonocel', 'filename')],
+              [Input('output-jsonocel-upload', 'children')],
               [State('uploaded-files-checklist', 'options')])
-def update_checklist_options(filenames, existing_options):
-    if filenames is not None:
-        # Append the filename of the most recently uploaded file to the existing options
-        updated_options = existing_options + [{'label': filename, 'value': filename} for filename in filenames]
-        return updated_options
-    return existing_options
+def update_checklist_options(children, existing_options):
+    options = log_management.all_keys()
+    if options is None:
+        options = []
+    updated_options =  [{'label': str(filename), 'value': str(filename)} for filename in options]
+    return updated_options
 
 
 # Download selected files DOES NOT WORK YET
-@app.callback(
+"""@app.callback(
     [Output("download-file", "data"), Output("download-file", "filename")],
     [Input("download-button", "n_clicks"),
      Input("uploaded-files-checklist", "value")]
 )
 def download_selected_files(n_clicks, selected_files):
     # Retrieve the data for the selected files from the SingletonClass object
-    data = [DataManagementSystem.load(file) for file in selected_files]
+    data = [log_management.load(file) for file in selected_files]
     # Encode the data as base64
     data = [base64.b64encode(d).decode('utf-8') for d in data]
     # Return the data and the filename for each selected file as a dictionary
-    return [data, selected_files]
-
+    return [data, selected_files]"""
 #delete selected files
 """@app.callback("""
 
