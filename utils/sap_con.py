@@ -28,6 +28,7 @@ class SapConnector:
             # Handle errors
             except (CommunicationError, LogonError, ABAPApplicationError, ABAPRuntimeError) as error:
                 print(error)
+                self.conn = None
                 raise
 
     def close_instance(self):
@@ -35,6 +36,7 @@ class SapConnector:
         if SapConnector.__instance != None:
             print("Closing SAP connection")
             self.conn.close()
+            self.conn = None
             print("SAP connection closed")
             self = None
 

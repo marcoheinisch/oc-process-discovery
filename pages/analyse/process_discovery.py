@@ -1,6 +1,12 @@
-from ocpa.objects.log.importer.ocel import factory as ocel_import_factory
-from ocpa.algo.discovery.ocpn import algorithm as ocpn_discovery_factory
-from ocpa.visualization.oc_petri_net import factory as ocpn_vis_factory
+import warnings
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from ocpa.objects.log.importer.ocel import factory as ocel_import_factory
+    from ocpa.algo.discovery.ocpn import algorithm as ocpn_discovery_factory
+    from ocpa.visualization.oc_petri_net import factory as ocpn_vis_factory
+    from pm4py.visualization.ocel.ocpn import visualizer as ocpn_visualizer
+    from pm4py.visualization.ocel.ocdfg import visualizer as ocdfg_visualizer
 
 import pm4py
 from pm4py.util import constants

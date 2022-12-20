@@ -6,4 +6,3 @@ from app import app
 from extraction.extraction import extract_ocel
 
 
-
