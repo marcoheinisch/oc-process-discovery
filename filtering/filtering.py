@@ -7,13 +7,12 @@ import dash_html_components as html
 import math
 import pm4py
 from pm4py.objects.ocel.obj import OCEL
-
+from app import app
 original_path = None
 log_paths = []
 ocel = None
 
 # should be triggered by sap extraction callback
-
 def prepare_for_filtering():
     global original_path
     original_path = 'test/p2p-normal.jsonocel'  # change later to the path of the extracted jsonocel
@@ -45,7 +44,6 @@ def save_filtered_ocel(ocel):
 
 
 prepare_for_filtering()
-app = dash.Dash()
 
 
 # panel components
@@ -228,8 +226,7 @@ def rollback(n_clicks):
 
 
 # create layout
-app.layout = html.Div(
-    [
+filtering_panel = [
         event_attribute_dropdown,
         event_attribute_checkboxes,
         event_attribute_positive_radio,
@@ -238,9 +235,4 @@ app.layout = html.Div(
         object_attribute_positive_radio,
         html.Button('Filter', id='filter-button'),
         html.Button('Rollback', id='rollback-button')
-    ],
-    id='filtering_panel'
-)
-
-if __name__ == '__main__':
-    app.run_server()
+    ]
