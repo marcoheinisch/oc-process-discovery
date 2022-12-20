@@ -2,8 +2,7 @@ from dash.dependencies import Input, Output, State
 import copy
 import os
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import html, dcc
 import math
 import pm4py
 from pm4py.objects.ocel.obj import OCEL
