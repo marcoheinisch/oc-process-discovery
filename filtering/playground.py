@@ -136,11 +136,16 @@ def update_object_attribute_checkboxes(keys):
     checkboxes = []
     for key in keys:
         s = set(get_ocel().objects[key])
-        elements = sorted(set(filter(lambda x: not math.isnan(x), s)))
-        # for x in s:
-        #     if math.isnan(x):
-        #         elements.append(x)
-        #         break
+        elements = copy.copy(s)
+        for x in s:
+            if str(x).replace('-', '', 1).replace('.', '', 1).isdigit():
+                elements = sorted(filter(lambda y: not math.isnan(y), s))
+                # for x in s:
+                #     if math.isnan(x):
+                #         elements.append(x)
+                #         break
+                break
+
         checkboxes.append(html.Div(
             children=[
                 dcc.Checklist(
