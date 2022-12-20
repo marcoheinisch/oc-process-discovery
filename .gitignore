@@ -129,6 +129,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+
+data/uploads/*.jsonocel
+data/results/*.png
+
+*.trc
 # pycharm
 /.idea/
 /.old/

@@ -1,4 +1,5 @@
 ## Flask
+UPLOAD_DIRECTORY = "data/uploads/"
 
 home_page_location = "/"
 dms_page_location = "/dms"
@@ -12,23 +13,33 @@ TIMEOUT = 60
 sqlite_path = 'data/internal_sqlite.db'
 
 # Number of rows that are downloaded in each call by the NWRFC library.
-ROWS_AT_A_TIME = 1000
+ROWS_AT_A_TIME = 3000
 
 # The following tables with given fields get downloaded from the SAP system into the local database.
 # Number shows how many of the following fields are in the primary key.
 tables = {
+    'BSAD': [11, 'MANDT', 'BUKRS', "KUNNR", "UMSKS", "UMSKZ", 'AUGDT', 'AUGBL', "ZUONR", 'GJAHR', 'BELNR', 'BLART', 'VBELN'],
+    'VBFA': [0, "ERDAT", "ERZET", "VBELN", "VBELV", "VBTYP_N", "VBTYP_V", "RFMNG", "MEINS", "RFWRT", "WAERS", "MATNR",
+             "BWART", "VRKME", "FKTYP", "POSNN", "POSNV"],
+    'VBAK': [0, "VBELN", "ERDAT", "ERZET", "KUNNR"],
+    'CDHDR': [4, 'MANDANT', 'OBJECTCLAS', 'OBJECTID', 'CHANGENR', 'USERNAME', 'UDATE', 'UTIME', 'TCODE', 'CHANGE_IND'],
+    'CDPOS': [8, 'MANDANT', 'OBJECTCLAS', 'OBJECTID', 'CHANGENR', 'TABNAME', 'TABKEY', 'FNAME', 'CHNGIND'],
+}
+
+tables2 = {
+    #'RBKP':[0, '*'],
     'EBAN': [3, 'MANDT', 'BANFN', 'BNFPO', 'BSART', 'EKGRP', 'ERDAT', 'BADAT', 'LFDAT', 'FRGDT', 'EBELN', 'EBELP',
              'BEDAT', 'PACKNO'],
-    'BSEG': [5, 'MANDT', 'BUKRS', 'BELNR', 'GJAHR', 'BUZEI', 'BUZID', 'AUGDT', 'AUGCP', 'AUGBL', 'BSCHL', 'KOART',
+    'BSEG': [5, 'MANDT', 'BUKRS', 'BELNR', 'GJAHR', 'BUZEI', 'BUZID',"VBELN", 'VBEL2', 'AUGDT', 'AUGCP', 'AUGBL', 'BSCHL', 'KOART',
              'SHKZG', 'VALUT', 'ZUONR', 'SAKNR', 'HKONT', 'LIFNR', 'ZFBDT', 'MATNR', 'AWTYP', 'H_BUDAT', 'H_BLDAT',
              'NETDT', 'SK1DT', 'SK2DT'],
 
-    'EKKO': [2, 'MANDT', 'EBELN', 'BUKRS', 'STATU', 'AEDAT', 'ERNAM', 'LPONR', 'LIFNR', 'BEDAT'],
+    #'EKKO': [2, 'MANDT', 'EBELN', 'BUKRS', 'STATU', 'AEDAT', 'ERNAM', 'LPONR', 'LIFNR', 'BEDAT'],
     # purchasing document
     'RBKP': [3, 'MANDT', 'BELNR', 'GJAHR', 'BLDAT', 'BUDAT', 'USNAM', 'TCODE', 'CPUDT', 'CPUTM', 'XBLNR', 'BUKRS',
              'LIFNR', 'RMWWR', 'ZFBDT', 'SGTXT', 'WWERT', 'NODE_KEY', 'ROOT_KEY'],
-    'RSEG': [4, 'MANDT', 'BELNR', 'GJAHR', 'BUZEI', 'EBELN', 'EBELP', 'MATNR', 'BWKEY', 'WERKS', 'MWSKZ', 'TXJCD',
-             'BKLAS', 'SPGRT', 'MATBF'],
+    #'RSEG': [4, 'MANDT', 'BELNR', 'GJAHR', 'BUZEI', 'EBELN', 'EBELP', 'MATNR', 'BWKEY', 'WERKS', 'MWSKZ', 'TXJCD',
+     #        'BKLAS', 'SPGRT', 'MATBF'],
     'EKBE': [8, 'MANDT', 'EBELN', 'EBELP', 'ZEKKN', 'VGABE', 'GJAHR', 'BELNR', 'BUZEI', 'BEWTP', 'BUDAT', 'MENGE',
              'BPMNG', 'DMBTR', 'WRBTR', 'AREWR', 'ELIKZ', 'XBLNR', 'CPUDT', 'CPUTM', 'REEWR', 'REFWR', 'MATNR', 'WERKS',
              'AREWW', 'BAMNG', 'BLDAT', 'ERNAM'],
@@ -43,9 +54,11 @@ tables = {
     # o2c ,
     'VBAK': [0, "VBELN", "ERDAT", "ERZET", "KUNNR"],
     'BKPF': [4, 'MANDT', 'BUKRS', 'BELNR', 'GJAHR', 'BLART', 'BLDAT', 'BUDAT', 'MONAT', 'CPUDT', 'CPUTM', 'WWERT',
-             'TCODE', 'BVORG', 'XBLNR', 'DOCCAT'],
+             'TCODE', 'BVORG', 'XBLNR', 'DOCCAT', 'AWTYP', 'AWKEY'],
     'VBFA': [0, "ERDAT", "ERZET", "VBELN", "VBELV", "VBTYP_N", "VBTYP_V", "RFMNG", "MEINS", "RFWRT", "WAERS", "MATNR",
              "BWART", "VRKME", "FKTYP", "POSNN", "POSNV"],
+    'VBRK': [2, 'MANDT', 'VBELN', 'VBTYP', 'BELNR', 'GJAHR'],
+    'BSAD': [11, 'MANDT', 'BUKRS', "KUNNR", "UMSKS", "UMSKZ", 'AUGDT', 'AUGBL', "ZUONR", 'GJAHR', 'BELNR', 'BLART', 'VBELN']
     # explains the status of objects that are associated with the o2c process / flow table
 }
 
@@ -71,6 +84,13 @@ tables = {
 #    'T003T',
 #    'TSTCT', #
 # }
+
+OBJECTCLAS_DESCRIPTIONS = {
+    "LIEFERUNG": "Delivery",
+    "VERKBELEG": "Order",
+}
+
+
 VBTYP_DESCRIPTIONS = {
     "A": "Inquiry",
     "B": "Quotation",
