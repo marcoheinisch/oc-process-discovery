@@ -14,7 +14,6 @@ ocel = None
 
 # should be triggered by sap extraction callback
 
-
 def prepare_for_filtering():
     global original_path
     original_path = 'test/p2p-normal.jsonocel'  # change later to the path of the extracted jsonocel
@@ -100,17 +99,30 @@ object_attribute_positive_radio = dcc.RadioItems(
 # define callback for updating element checkboxes
 @app.callback(
     Output('event-attribute-checkboxes', 'children'),
-    [Input('event-attribute-dropdown', 'value')]
+    [Input('event-attribute-dropdown', 'value')],
+    State('event-attribute-checkboxes', 'children')
 )
-def update_event_attribute_checkboxes(keys):
+def update_event_attribute_checkboxes(keys, children):
+    selected_values = {}
+    for child in children:
+        print(child)
+        key = child['props']['children'][0]['props']['id'].rsplit('-', 1)[0]
+        value = child['props']['children'][0]['props']['value']
+        print(key)
+        selected_values[key] = value
+        print(value)
+
     checkboxes = []
     for key in keys:
+        if key not in selected_values:
+            selected_values[key] = []
+
         checkboxes.append(html.Div(
             children=[
                 dcc.Checklist(
                     id=f'{key}-checklist',
                     options=[{'label': element, 'value': element} for element in sorted(set(get_ocel().events[key]))],
-                    value=[]
+                    value=selected_values[key]
                 )
             ]
         ))
@@ -130,9 +142,19 @@ def update_event_attribute_positive_flag(value):
 # define callback for updating element checkboxes
 @app.callback(
     Output('object-attribute-checkboxes', 'children'),
-    [Input('object-attribute-dropdown', 'value')]
+    [Input('object-attribute-dropdown', 'value')],
+    State('object-attribute-checkboxes', 'children')
 )
-def update_object_attribute_checkboxes(keys):
+def update_object_attribute_checkboxes(keys, children):
+    selected_values = {}
+    for child in children:
+        print(child)
+        key = child['props']['children'][0]['props']['id'].rsplit('-', 1)[0]
+        value = child['props']['children'][0]['props']['value']
+        print(key)
+        selected_values[key] = value
+        print(value)
+
     checkboxes = []
     for key in keys:
         s = set(get_ocel().objects[key])
@@ -146,12 +168,15 @@ def update_object_attribute_checkboxes(keys):
                 #         break
                 break
 
+        if key not in selected_values:
+            selected_values[key] = []
+
         checkboxes.append(html.Div(
             children=[
                 dcc.Checklist(
                     id=f'{key}-checklist',
                     options=[{'label': element, 'value': element} for element in elements],
-                    value=[]
+                    value=selected_values[key]
                 )
             ]
         ))
@@ -176,7 +201,7 @@ def update_object_attribute_positive_flag(value):
 # define callback for rollback
 @app.callback(
     [
-        Output('event_attribute_dropdown', 'value'),
+        Output('event-attribute-dropdown', 'value'),
         Output('event-attribute-checkboxes', 'value'),
         Output('event-attribute-positive-radio', 'value'),
         Output('object_attribute_dropdown', 'value'),
