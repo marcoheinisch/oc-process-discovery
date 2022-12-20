@@ -29,7 +29,7 @@ pm_page_content = html.Div(
 )
 
 layout = html.Div([
-    html.H1("Process Mining"),
+    html.H1("Process Analysis"),
     html.Hr(),
     pm_page_content,
     pm_sidebar

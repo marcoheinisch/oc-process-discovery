@@ -18,57 +18,56 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 # Layout for the file upload component
 layout = html.Div([
     # Header
-    html.H1("Dataset Management"),
+    html.H1("Data Management"),
     html.Hr(),
     
-    # Extract from SAP button
     html.Div([
-        html.Button('Extract from SAP', id='btn-extract', n_clicks=0),
-        html.Div(id='container-feedback-text')
-    ], style={'width': '30%', 'display': 'inline-block', 'padding': '10px'}),
-    
-    # File upload component
-    html.Div([
-        dcc.Upload(
-            id='upload-jsonocel',
-            children=html.Div([
-                html.A('Upload .jsonocel files')
-            ]),
-            style={
-                'width': '15%',
-                'height': '40px',
-                'lineHeight': '40px',
-                'borderWidth': '1px',
-                'borderStyle': 'dashed',
-                'borderRadius': '5px',
-                'textAlign': 'center',
-                'margin': '10px'
-            },
-            # Allow multiple files to be uploaded
-            multiple=True,
-            # Only allow files with the .jsonocel extension to be selected
-            accept=".jsonocel"
+        # Extract from SAP button
+        html.H6("Upload or extract log"),
+        html.Div([
+            html.Button('Extract from SAP', id='btn-extract', n_clicks=0, style={'width': '100%'}),
+            html.Div(id='container-feedback-text')
+        ], style={'width': '100%', 'display': 'inline-block', 'padding': '10px'}),
+        
+        # File upload component
+        html.Div([
+            dcc.Upload(
+                id='upload-jsonocel',
+                children=html.Div([
+                    html.A('Upload .jsonocel files')
+                ]),
+                style={
+                    'width': '100%',
+                    'height': '40px',
+                    'lineHeight': '40px',
+                    'borderWidth': '1px',
+                    'borderStyle': 'dashed',
+                    'borderRadius': '5px',
+                    'textAlign': 'center',
+                },
+                # Allow multiple files to be uploaded
+                multiple=True,
+                # Only allow files with the .jsonocel extension to be selected
+                accept=".jsonocel"
 
-        ),
-        html.Div(id='output-jsonocel-upload'),
-    ], style={'padding': '10px'}),
-    
-    # Data management component
-    html.Div([
-        html.H6("View and select File for analysis"),
-        html.Div(
-            html.Div([
-                html.Div(html.B("Your files")),
-                dcc.RadioItems(id='uploaded-files-checklist', options=[]),
-                # Delete button
-                html.Button(id='delete-file-button', children='Delete'),
-                # Download button
-                html.Button("Download", id="download-button", n_clicks=0),
-                dcc.Download(id="download-file")
-            ], style={'width': '25%', 'display': 'inline-block'}),
-            style={'color': 'grey', 'height': '300px', 'width': '300%', 'display': 'flex', 'justify-content': 'left'}),
-        ], style={'width': '33%', 'display': 'inline-block', 'vertical-align': 'top', 'padding': '10px'}),
-    ])
+            ),
+            html.Div(id='output-jsonocel-upload', style={'width': '100%'}),
+        ], style={'width': '100%', 'padding': '10px'}),
+        
+        # Data management component
+        html.Div([
+            html.H6("View and select File for analysis"),
+            #html.Div(html.B("Your files")),
+            dcc.RadioItems(id='uploaded-files-checklist', options=[], style={'width': '100%'}),
+            # Delete button
+            html.Button(id='delete-file-button', children='Delete', style={'width': '50%'}),
+            # Download button
+            html.Button("Download", id="download-button", n_clicks=0, style={'width': '50%'}),
+            dcc.Download(id="download-file"),
+        ], style={'width': '100%', 'display': 'inline-block', 'vertical-align': 'top', 'padding': '10px'}),
+    # Global dms div
+    ], style={'width': '40%', 'display': 'inline-block', 'padding': '10px'}),
+])
 
 
     
@@ -82,7 +81,7 @@ layout = html.Div([
 #store the contents of an uploaded file(s) and display a message indicating the file(s) was successfully uploaded
 def parse_contents(contents, filename, date): #date is not used yet
     if contents is None:
-        return "None"
+        return "No files uploaded"
     for i in range(len(contents)):
         log_management.store(filename[i], contents[i])
     return html.Div([

@@ -8,7 +8,7 @@ from utils.constants import home_page_location, dms_page_location, analyse_page_
 # it consists of a title, and a toggle, the latter is hidden on large screens
 sidebar_header = dbc.Row(
     [
-        dbc.Col(html.H2("Sidebar", className="display-4")),
+        dbc.Col(html.H2("OCEL", className="display-4")),
         dbc.Col(
             [
                 html.Button(
@@ -45,8 +45,7 @@ sidebar = html.Div(
                     }
                 ),
                 html.P(
-                    "A responsive sidebar layout with collapsible navigation "
-                    "links.",
+                    "A web tool used to upload or extract object-centic events from SAP and analyse them.",
                     className="lead",
                 ),
             ],

@@ -81,15 +81,6 @@ sidebar = html.Div(
                     },
                     id="pm-hr"
                 ),
-                html.P(
-                    "A responsive sidebar layout with collapsible navigation "
-                    "links.",
-                    className="lead",
-                    style={
-                        "color": "#f8f9fa",
-                    },
-                    id="pm-intro"
-                ),
             ],
             id="pm-blurb",
         ),
