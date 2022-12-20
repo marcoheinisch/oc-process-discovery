@@ -1,4 +1,5 @@
 ## Flask
+UPLOAD_DIRECTORY = "data/uploads/"
 
 home_page_location = "/"
 dms_page_location = "/dms"

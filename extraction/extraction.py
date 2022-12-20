@@ -1,11 +1,14 @@
 """Provide Funktion for extraction of an jsonocel data from SAP tables dataframes."""
 import pandas as pd
 import json
+import os
+from datetime import datetime
 
 from utils import constants
-from utils.constants import VBTYP_DESCRIPTIONS, OBJECTCLAS_DESCRIPTIONS
+from utils.constants import VBTYP_DESCRIPTIONS, UPLOAD_DIRECTORY, OBJECTCLAS_DESCRIPTIONS
 from utils.sap_con import SapConnector
 from environment.settings import SAP_CON_PARAMS
+from app import log_management
 
 
 def columns_astype_str(df, columns, regex: str = ""):
@@ -201,7 +204,6 @@ def export_jsonocel(log: dict, file_path: str = "log.jsonocel"):
 def get_tables_from_sap(sap_con) -> dict[str, pd.DataFrame]:
     # Get SAP connection
 
-
     tables = {}
     for table, fields in constants.tables.items():
         results, headers = sap_con.qry(
@@ -229,7 +231,11 @@ def extract_ocel() -> str:
         return "An error occurred."
     tables = get_tables_from_sap(sap_con)
     log = extract_jsonocel_data(tables)
-    export_jsonocel(log, file_path="data/resources/sap.jsonocel")
+    
+    log_name = "extracted_at_{}.jsonocel".format(datetime.now().strftime("%y%m%d_%H%M%S"))
+    log_path = os.path.join(UPLOAD_DIRECTORY, log_name)
+    export_jsonocel(log, file_path=log_path)
+    log_management.register(log_name, log_path)
     return "Extraction successful."
 
 

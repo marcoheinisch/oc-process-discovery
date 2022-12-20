@@ -4,6 +4,7 @@ import diskcache
 from flask_caching import Cache
 from dash import DiskcacheManager
 
+from dms.dms import DataManagementSystem
 from utils.external_assets import FONT_AWSOME, CUSTOM_STYLE
 from layout.layout import layout
 from uuid import uuid4
@@ -38,6 +39,7 @@ cache = Cache(app.server, config={
     'CACHE_DIR': 'cache-directory'
 })
 
+log_management = DataManagementSystem()
 
 app.layout = layout
 
