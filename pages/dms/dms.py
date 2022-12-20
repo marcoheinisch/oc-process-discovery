@@ -5,7 +5,7 @@ from dash.dependencies import Input, Output, State
 from app import log_management
 from app import app
 from extraction.extraction import extract_ocel
-from filtering.filtering import filtering_panel
+from filtering.filtering import filtering_panel, prepare_for_filtering
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -15,7 +15,7 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 
 
-
+ 
 # Layout for the file upload component
 layout = html.Div([
     # Header
@@ -67,7 +67,7 @@ layout = html.Div([
             # Download button
             html.Button("Download", id="download-button", n_clicks=0, style={'width': '50%'}),
             dcc.Download(id="download-file"),
-        ], style={'width': '100%', 'display': 'inline-block', 'vertical-align': 'top', 'padding': '10px'}),
+        ], style={'width': '100%', 'display': 'inline-block', 'vertical-align': 'top'}),
         
         html.Div([
             html.H6("Filter Data"),
@@ -100,6 +100,8 @@ def parse_contents(contents, filename, date): #date is not used yet
               [Input('uploaded-files-checklist', 'value')])
 def select_checklist_options(value):
     log_management.select(value)
+    
+    prepare_for_filtering()
     return 'You have selected "{}" for analysis'.format(value)
 
 #list of uploaded files

@@ -7,22 +7,24 @@ import dash_html_components as html
 import math
 import pm4py
 from pm4py.objects.ocel.obj import OCEL
+
 from app import app
-original_path = None
-log_paths = []
-ocel = None
+from app import log_management
+
 
 # should be triggered by sap extraction callback
 def prepare_for_filtering():
-    global original_path
-    original_path = 'test/p2p-normal.jsonocel'  # change later to the path of the extracted jsonocel
-    global log_paths
+    original_path = log_management.load_selected()
+    log_paths = log_management.get_filter_steps()
     log_paths.append(copy.deepcopy(original_path))
-    global ocel
+    log_management.set_filter_steps(log_paths)
     ocel = pm4py.read_ocel(get_path())
+    log_management.set_filter_ocel(ocel)
+
 
 
 def get_path():
+    log_paths = log_management.get_filter_steps()
     return log_paths[len(log_paths) - 1]
 
 
@@ -31,6 +33,7 @@ def get_ocel() -> OCEL:
 
 
 def get_new_path_name():
+    log_paths = log_management.get_filter_steps()
     length = len(log_paths)
     if length == 1:
         return 'test/filtered_ocel.json'
@@ -40,6 +43,7 @@ def get_new_path_name():
 def save_filtered_ocel(ocel):
     path = get_new_path_name()
     pm4py.write_ocel(ocel, path)
+    log_paths = log_management.get_filter_steps()
     log_paths.append(path)
 
 
@@ -190,13 +194,7 @@ def update_object_attribute_positive_flag(value):
     return value
 
 
-
-
-
-
-
-
-# define callback for rollback
+"""# define callback for rollback
 @app.callback(
     [
         Output('event-attribute-dropdown', 'value'),
@@ -222,7 +220,7 @@ def rollback(n_clicks):
     ocel = pm4py.read_ocel(get_path())
 
     # reset filtering options to default values
-    return [], [], True, [], [], True
+    return [], [], True, [], [], True"""
 
 
 # create layout

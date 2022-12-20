@@ -13,6 +13,8 @@ class SingletonClass(object):
             # Initialize the data attribute as an empty dictionary
             cls.instance.data = {}
             cls.instance.selected = None
+            cls.instance.filter_steps = []
+            cls.instance.filter_ocel = None
         # Return the existing instance of the class
         return cls.instance
 
@@ -74,7 +76,6 @@ class DataManagementSystem:
         # Retrieve the data from the data attribute of the singleton instance
         return list(singleton_instance.data.keys())
 
-
     @classmethod
     def register(cls, key, path):
         """Store already existing ocel path in singleton instance"""
@@ -82,3 +83,27 @@ class DataManagementSystem:
         singleton_instance = SingletonClass()
         # Store the data infile and store path in singleton instance
         singleton_instance.data[key] = path
+        
+    @classmethod
+    def set_filter_steps(cls, steps):
+        """Set filter steps"""
+        singleton_instance = SingletonClass()
+        singleton_instance.filter_steps = steps
+        
+    @classmethod
+    def set_filter_ocel(cls, ocel):
+        """Set filter ocel"""
+        singleton_instance = SingletonClass()
+        singleton_instance.filter_ocel = ocel
+    
+    @classmethod
+    def get_filter_steps(cls):
+        """Get filter steps"""
+        singleton_instance = SingletonClass()
+        return singleton_instance.filter_steps
+    
+    @classmethod
+    def get_filter_ocel(cls):
+        """Get filter ocel"""
+        singleton_instance = SingletonClass()
+        return singleton_instance.filter_ocel

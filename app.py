@@ -40,6 +40,8 @@ cache = Cache(app.server, config={
 })
 
 log_management = DataManagementSystem()
+log_management.register("sap.jsonocel", "data/resources/sap.jsonocel")
+log_management.select("sap.jsonocel")
 
 app.layout = layout
 
