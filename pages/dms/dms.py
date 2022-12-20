@@ -24,10 +24,12 @@ layout = html.Div([
     html.Div([
         # Extract from SAP button
         html.H6("Upload or extract log"),
-        html.Div([
-            html.Button('Extract from SAP', id='btn-extract', n_clicks=0, style={'width': '100%'}),
-            html.Div(id='container-feedback-text')
-        ], style={'width': '100%', 'display': 'inline-block', 'padding': '10px'}),
+        dcc.Loading(id='loading-extract', children=[
+            html.Div([
+                html.Button('Extract from SAP', id='btn-extract', n_clicks=0, style={'width': '100%'}),
+                html.Div(id='container-feedback-text')
+            ], style={'width': '100%', 'display': 'inline-block', 'padding': '10px'}),
+        ], type='default'),
         
         # File upload component
         html.Div([
