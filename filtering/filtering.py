@@ -14,6 +14,8 @@ from app import log_management
 # should be triggered by sap extraction callback
 def prepare_for_filtering():
     original_path = log_management.load_selected()
+    if original_path == None:
+        return
     log_paths = log_management.get_filter_steps()
     log_paths.append(copy.deepcopy(original_path))
     log_management.set_filter_steps(log_paths)

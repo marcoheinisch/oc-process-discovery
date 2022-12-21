@@ -177,6 +177,7 @@
 
   #pm-page-content {
     margin-left: 2rem;
+    margin-right: 22rem;
     transition: margin-right 0.3s ease-in-out;
   }
 
@@ -193,8 +194,6 @@
   }
 }
 #process-model{
-  max-width: 80rem;
+  max-width: 65%;
   min-width: 0rem;
-}
-#process-model {
 }
