@@ -10,7 +10,7 @@ class SapConnector:
 
     def getInstance(conn_params):
         """A function to return singleton SAP connection"""
-        if not (SapConnector.__instance != None):
+        if SapConnector.__instance == None:
             SapConnector(conn_params)
         return SapConnector.__instance
 
@@ -38,7 +38,7 @@ class SapConnector:
             self.conn.close()
             self.conn = None
             print("SAP connection closed")
-            self = None
+            SapConnector.__instance = None
 
     def qry(self, Fields, SQLTable, Where='', MaxRows=50, FromRow=0):
         """A function to query SAP with RFC_READ_TABLE"""
