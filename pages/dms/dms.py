@@ -1,6 +1,7 @@
 from datetime import date
 from dash import Dash, dcc, html, ctx
 from dash.dependencies import Input, Output, State
+import dash_bootstrap_components as dbc
 
 from app import log_management
 from app import app
@@ -67,8 +68,38 @@ layout = html.Div([
             html.Button("Download", id="download-button", n_clicks=0, style={'width': '50%'}),
             dcc.Download(id="download-file"),
         ], style={'width': '100%', 'display': 'inline-block', 'vertical-align': 'top', 'padding': '10px'}),
+    
+        # Modal for SAP connection configuration
+        html.Div([
+            html.H6("Configure SAP connection configuration"),
+            html.Button("Configure", id="open", n_clicks=0),
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle("SAP connection configuration")),
+                dbc.ModalBody("Select a parameter to be modified:"),
+                dcc.Dropdown(['user', 'passwd', 'ashost', 'saprouter', 'msserv', 'sysid', 'group', 'client', 'lang', 'trace'], 'user', id='param-dropdown'),
+                html.Div(id='dd-output-container'),
+                html.Div([
+                    dbc.Input(id="input", placeholder="Enter new value.", type="text"),
+                    html.Br(),
+                    html.P(id="output"),
+                ]),
+                html.Button(
+                    "Save", id="save", n_clicks=0
+                ),
+                html.Div(id='save-output'),
+                dbc.ModalFooter(
+                    dbc.Button(
+                        "Close", id="close", className="ms-auto", n_clicks=0
+                    )
+                ),
+            ],
+            id="modal",
+            is_open=False,),
+        ])
+    
     # Global dms div
     ], style={'width': '40%', 'display': 'inline-block', 'padding': '10px'}),
+
 ])
 
 
@@ -95,7 +126,43 @@ def parse_contents(contents, filename, date): #date is not used yet
               [Input('uploaded-files-checklist', 'value')])
 def select_checklist_options(value):
     log_management.select(value)
-    return 'You have selected "{}" for analysis'.format(value)
+    return '  You have selected "{}" for analysis'.format(value)
+
+# Callback function to open the modal
+@app.callback(
+    Output("modal", "is_open"),
+    [Input("open", "n_clicks"), Input("close", "n_clicks")],
+    [State("modal", "is_open")],
+)
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+# Callback function to select parameter in dropdown menu (modal)
+@app.callback(
+    Output('dd-output-container', 'children'),
+    Input('param-dropdown', 'value')
+)
+def update_output(value):
+    return f'You have selected {value}.'
+
+# Callback to return input given in modal
+@app.callback(Output("output", "children"), [Input("input", "value")])
+def output_text(value):
+    return f'New value: {value}'
+
+# Callback to save input given in modal
+@app.callback(
+    Output('save-output', 'children'),
+    Input('save', 'n_clicks'),
+)
+def displayClick(save_btn):
+    msg = "Not saved."
+    if "save" == ctx.triggered_id:
+        msg = "Save successful."
+    return html.Div(msg)
+
 
 #list of uploaded files
 @app.callback(Output('uploaded-files-checklist', 'options'),
