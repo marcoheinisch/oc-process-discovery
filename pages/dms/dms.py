@@ -7,6 +7,8 @@ from app import log_management
 from app import app
 from extraction.extraction import extract_ocel
 
+from environment import settings
+
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -75,18 +77,18 @@ layout = html.Div([
             html.Button("Configure", id="open", n_clicks=0),
             dbc.Modal([
                 dbc.ModalHeader(dbc.ModalTitle("SAP connection configuration")),
-                dbc.ModalBody("Select a parameter to be modified:"),
+                dbc.ModalBody("Select a parameter to be modified and enter its new value below."),
                 dcc.Dropdown(['user', 'passwd', 'ashost', 'saprouter', 'msserv', 'sysid', 'group', 'client', 'lang', 'trace'], 'user', id='param-dropdown'),
                 html.Div(id='dd-output-container'),
                 html.Div([
                     dbc.Input(id="input", placeholder="Enter new value.", type="text"),
-                    html.Br(),
                     html.P(id="output"),
                 ]),
                 html.Button(
                     "Save", id="save", n_clicks=0
                 ),
                 html.Div(id='save-output'),
+                html.Br(),
                 dbc.ModalFooter(
                     dbc.Button(
                         "Close", id="close", className="ms-auto", n_clicks=0
@@ -101,9 +103,6 @@ layout = html.Div([
     ], style={'width': '40%', 'display': 'inline-block', 'padding': '10px'}),
 
 ])
-
-
-    
 
 
 # Callback function to store the contents of the uploaded file
@@ -139,13 +138,19 @@ def toggle_modal(n1, n2, is_open):
         return not is_open
     return is_open
 
+# Help variables to help saving a new parameter
+class HV:
+    param_to_change = None
+    param_new_value = None
+
 # Callback function to select parameter in dropdown menu (modal)
 @app.callback(
     Output('dd-output-container', 'children'),
     Input('param-dropdown', 'value')
 )
 def update_output(value):
-    return f'You have selected {value}.'
+    HV.param_to_change = value
+    return f'You have selected: {value}'
 
 # Callback to return input given in modal
 @app.callback(Output("output", "children"), [Input("input", "value")])
@@ -160,7 +165,27 @@ def output_text(value):
 def displayClick(save_btn):
     msg = "Not saved."
     if "save" == ctx.triggered_id:
-        msg = "Save successful."
+        if HV.param_to_change == 'user':
+            settings.SAP_USER = HV.param_new_value
+        if HV.param_to_change == 'passwd':
+            settings.SAP_PASSWD = HV.param_new_value
+        if HV.param_to_change == 'ashost':
+            settings.SAP_ASHOST = HV.param_new_value
+        if HV.param_to_change == 'saprouter':
+            settings.SAP_SAPROUTER = HV.param_new_value
+        if HV.param_to_change == 'msserv':
+            settings.SAP_MSSERV = HV.param_new_value  
+        if HV.param_to_change == 'sysid':
+            settings.SAP_SYSID = HV.param_new_value  
+        if HV.param_to_change == 'group':
+            settings.SAP_GROUP = HV.param_new_value  
+        if HV.param_to_change == 'client':
+            settings.SAP_CLIENT = HV.param_new_value
+        if HV.param_to_change == 'lang':
+            settings.SAP_LANG = HV.param_new_value  
+        if HV.param_to_change == 'trace':
+            settings.SAP_TRACE = HV.param_new_value  
+        msg = f"New value for {HV.param_to_change} saved successfully."
     return html.Div(msg)
 
 
