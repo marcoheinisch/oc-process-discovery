@@ -4,6 +4,7 @@ import os
 import dash
 from dash import html, dcc
 import math
+import re
 import pm4py
 from pm4py.objects.ocel.obj import OCEL
 
@@ -162,14 +163,19 @@ def update_object_attribute_checkboxes(keys, children):
     for key in keys:
         s = set(get_ocel().objects[key])
         elements = copy.copy(s)
+
+        def is_real_number(x):
+            pattern1 = r'^[+-]?\d*\.?\d+$'
+            pattern2 = r'^0+[1-9]\d*\.?\d*$'
+            return bool(re.match(pattern1, x)) and not bool(re.match(pattern2, x))
+
+        are_real_numbers = True
         for x in s:
-            if str(x).replace('-', '', 1).replace('.', '', 1).isdigit():
-                elements = sorted(filter(lambda y: not math.isnan(y), s))
-                # for x in s:
-                #     if math.isnan(x):
-                #         elements.append(x)
-                #         break
+            if not is_real_number(x):
+                are_real_numbers = False
                 break
+        if are_real_numbers:
+            elements = sorted(filter(lambda y: not math.isnan(y), s))
 
         if key not in selected_values:
             selected_values[key] = []
