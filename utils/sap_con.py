@@ -5,40 +5,26 @@ except ImportError:
 from environment.settings import SAP_CON_PARAMS
 
 class SapConnector:
-    """Singleton SAP connector to connect to the SAP system with PYRFC"""
-    __instance = None
-
-    def getInstance(conn_params):
-        """A function to return singleton SAP connection"""
-        if SapConnector.__instance == None:
-            SapConnector(conn_params)
-        return SapConnector.__instance
-
     def __init__(self, conn_params):
-        """ Virtually private constructor. """
-        if SapConnector.__instance != None:
-            raise Exception("This class is a singleton!")
-        else:
-            print("Initialize SAP Connector")
-            SapConnector.__instance = self
-            try:
-                self.conn = Connection(**conn_params)
-                print("SAP connection successful")
+        print("Initialize SAP Connector")
+        try:
+            self.conn = Connection(**conn_params)
+            print("SAP connection successful")
 
-            # Handle errors
-            except (CommunicationError, LogonError, ABAPApplicationError, ABAPRuntimeError) as error:
-                print(error)
-                self.conn = None
-                raise
+        # Handle errors
+        except (CommunicationError, LogonError, ABAPApplicationError, ABAPRuntimeError) as error:
+            print(error)
+            raise
+        
+    def __del__(self):
+        if self.conn != None:
+            self.conn.close()
+        print("SAP Connector deleted")
 
     def close_instance(self):
         """A function the destroy the singleton SAP connection"""
-        if SapConnector.__instance != None:
-            print("Closing SAP connection")
-            self.conn.close()
-            self.conn = None
-            print("SAP connection closed")
-            SapConnector.__instance = None
+        self.conn.close()
+        print("SAP connection closed")
 
     def qry(self, Fields, SQLTable, Where='', MaxRows=50, FromRow=0):
         """A function to query SAP with RFC_READ_TABLE"""

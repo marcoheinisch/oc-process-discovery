@@ -115,7 +115,7 @@ def construct_ocel_dict(df_events: pd.DataFrame, df_objects: pd.DataFrame) -> di
     return log
 
 
-def extract_jsonocel_data(tables):
+def extract_jsonocel(tables) -> dict:
     """Return jsonocel data from SAP tables dataframes."""
 
     # 1.1 Get all events creating a new document in VBFA
@@ -190,7 +190,7 @@ def extract_jsonocel_data(tables):
     return log_dict
 
 
-def export_jsonocel(log: dict, file_path: str = "log.jsonocel"):
+def dump_jsonocel(log: dict, file_path: str = "log.jsonocel"):
     """Export jsonocel to .jsonocel file."""
 
     def json_serial(obj):
@@ -222,21 +222,24 @@ def extract_ocel() -> str:
         from pyrfc import Connection, ABAPApplicationError, ABAPRuntimeError, LogonError, CommunicationError
     except ImportError:
         return "Application Error: PyRFC not installed"
+    
     try:
-        sap_con = SapConnector.getInstance(SAP_CON_PARAMS)
+        sap_con = SapConnector(SAP_CON_PARAMS)
     except CommunicationError:
         return "Could not connect to server."
     except LogonError:
         return "Could not log in. Wrong credentials?"
     except (ABAPApplicationError, ABAPRuntimeError):
         return "An error occurred."
-    tables = get_tables_from_sap(sap_con)
-    sap_con.close_instance()
     
-    log = extract_jsonocel_data(tables)
+    tables = get_tables_from_sap(sap_con)
+    del sap_con
+    
+    log = extract_jsonocel(tables)
     log_name = "extracted_at_{}.jsonocel".format(datetime.now().strftime("%y%m%d_%H%M%S"))
     log_path = os.path.join(UPLOAD_DIRECTORY, log_name)
-    export_jsonocel(log, file_path=log_path)
+    
+    dump_jsonocel(log, file_path=log_path)
     log_management.register(log_name, log_path)
     return "Extraction successful."
 
