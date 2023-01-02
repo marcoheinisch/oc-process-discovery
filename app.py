@@ -8,6 +8,7 @@ from dms.dms import DataManagementSystem
 from utils.external_assets import FONT_AWSOME, CUSTOM_STYLE
 from layout.layout import layout
 from uuid import uuid4
+from dash_extensions.enrich import Output, DashProxy, Input, State, MultiplexerTransform
 
 import flask
 
@@ -19,7 +20,7 @@ background_callback_manager = DiskcacheManager(
     callback_cache, cache_by=[lambda: uuid4()], expire=60
 )
 
-app = dash.Dash(
+app = DashProxy(
     __name__,
     server=server,
     suppress_callback_exceptions=True,
@@ -31,7 +32,8 @@ app = dash.Dash(
     ],
     meta_tags=[
         {"name": "viewport", "content": "width=device-width, initial-scale=1"}
-    ]
+    ],
+    transforms=[MultiplexerTransform()]
 )
 
 cache = Cache(app.server, config={

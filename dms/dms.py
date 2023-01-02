@@ -1,5 +1,7 @@
 import os
 import base64
+from pm4py.objects.ocel.obj import OCEL
+import pm4py
 
 from utils.constants import UPLOAD_DIRECTORY
 
@@ -18,7 +20,7 @@ class SingletonClass(object):
 
 class DataManagementSystem:
     @classmethod
-    def add_version_control(cls, key):
+    def __add_version_control(cls, key):
         # Get the single instance of the SingletonClass object
         singleton_instance = SingletonClass()
         list_key = key + '_filter_list'
@@ -28,14 +30,14 @@ class DataManagementSystem:
         singleton_instance.data[list_key] = list_values
 
     @classmethod
-    def store_version_control(cls, key, content):
+    def store_version_control(cls, key, ocel):
         list_key = key + '_filter_list'
-        filter_list = cls.load(list_key)
-        filter_list.append(content)
+        filter_list = cls.__load(list_key)
+        filter_list.append(ocel)
     @classmethod
     def load_version_control(cls, key):
         list_key = key + '_filter_list'
-        filter_list = cls.load(list_key)
+        filter_list = cls.__load(list_key)
         return filter_list[len(filter_list) - 1]
 
     @classmethod
@@ -50,10 +52,10 @@ class DataManagementSystem:
             fp.write(base64.decodebytes(data))
         singleton_instance.data[key] = path
         # Add version control for future filtering
-        cls.add_version_control(key)
+        cls.__add_version_control(key)
         
     @classmethod
-    def load(cls, key) -> str:
+    def __load(cls, key) -> str:
         """Get path of ocel from key
         """
         # Get the single instance of the SingletonClass object
@@ -62,13 +64,19 @@ class DataManagementSystem:
         return singleton_instance.data.get(key)       
         
     @classmethod
-    def load_selected(cls) -> str:
+    def __load_selected(cls) -> str:
         """Get path of selected ocel
         """
         # Get the single instance of the SingletonClass object
         singleton_instance = SingletonClass()
         # Retrieve the data from the data attribute of the singleton instance
         return cls.load_version_control(singleton_instance.selected)
+
+    def get_ocel(cls) -> OCEL:
+        selected = cls.__load_selected()
+        if selected is OCEL:
+            return selected
+        return pm4py.read_ocel(selected)
 
     @classmethod
     def delete(cls, key):
@@ -106,6 +114,6 @@ class DataManagementSystem:
         singleton_instance.data[key] = path
         # Add version control for future filtering
         if UPLOAD_DIRECTORY in path:
-            cls.add_version_control(key)
+            cls.__add_version_control(key)
 
 

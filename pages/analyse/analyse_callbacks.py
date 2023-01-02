@@ -1,5 +1,5 @@
+from dash_extensions.enrich import Output, Input, State
 
-from dash.dependencies import Input, Output
 from app import app
 #from app import long_callback_manager 
 from pages.analyse.analyse_data import dataframe

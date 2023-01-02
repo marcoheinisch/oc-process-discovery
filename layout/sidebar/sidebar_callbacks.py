@@ -1,4 +1,5 @@
-from dash.dependencies import Input, Output, State
+from dash_extensions.enrich import Output, Input, State
+
 
 from app import app
 

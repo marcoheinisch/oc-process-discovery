@@ -1,6 +1,6 @@
 from datetime import date
 from dash import Dash, dcc, html, ctx
-from dash.dependencies import Input, Output, State
+from dash_extensions.enrich import Output, Input, State
 
 from app import log_management
 from app import app

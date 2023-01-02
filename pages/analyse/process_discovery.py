@@ -15,9 +15,7 @@ from pm4py.objects.ocel.constants import OCEL_GLOBAL_EVENT
 from app import log_management
 
 def ocpa_discover():
-    # delete those two lines later on (only for testing purposes until a proper ocel extraction and data management interfaces are in place
-    filename=log_management.load_selected()
-    ocel = ocel_import_factory.apply(file_path=filename)
+    ocel = log_management.get_ocel()
     ocpn = ocpn_discovery_factory.apply(ocel, parameters={"debug": False})
     ocpn_vis_factory.save(ocpn_vis_factory.apply(ocpn), "data/results/oc_petri_net_ocpa.png")
     dot = ocpn_vis_factory.apply(ocpn).source
@@ -43,9 +41,7 @@ def pm4py_discover():
     return dot
 
 def dfg_discover():
-    # delete those two lines later on (only for testing purposes until a proper ocel extraction and data management interfaces are in place
-    filename = log_management.load_selected()
-    ocel = pm4py.read_ocel(file_path=filename)
+    ocel = log_management.get_ocel()
     ocpn = pm4py.discover_ocdfg(ocel)
     pm4py.save_vis_ocdfg(ocpn, "data/results/oc_dfg_pm4py.png")
     from pm4py.visualization.ocel.ocdfg import visualizer as ocdfg_visualizer

@@ -1,4 +1,5 @@
-from dash.dependencies import Input, Output, State
+from dash_extensions.enrich import Output, Input, State
+
 import copy
 import os
 import dash
