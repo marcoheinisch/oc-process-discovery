@@ -11,7 +11,6 @@ APP_PORT = int(os.environ.get("PORT"))
 APP_DEBUG = bool(os.environ.get("DEBUG"))
 DEV_TOOLS_PROPS_CHECK = bool(os.environ.get("DEV_TOOLS_PROPS_CHECK"))
 
-SAP_CON_PARAMS = os.environ.get("SAP_CON_PARAMS")
 SAP_USER = os.environ.get("SAP_USER")
 SAP_PASSWD = os.environ.get("SAP_PASSWD")
 SAP_ASHOST = os.environ.get("SAP_ASHOST")

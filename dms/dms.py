@@ -17,6 +17,21 @@ class SingletonClass(object):
         return cls.instance
 
 class DataManagementSystem:
+    """Singleton class to manage data storage and retrieval"""
+    # A changeable variable of the Singelton storing a configuration dict
+    sap_config = {
+        'user': '',
+        'passwd': '',
+        'ashost': '',
+        'saprouter': '',
+        'msserv': '',
+        'sysid': '',
+        'group': '',
+        'client': '',
+        'lang': '',
+        'trace': ''
+    }
+    
     @classmethod
     def store(cls, key, contents):
         """Save content to file and store path in singleton instance"""

@@ -1,4 +1,5 @@
 from datetime import date
+import os
 from dash import Dash, dcc, html, ctx
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
@@ -7,15 +8,10 @@ from app import log_management
 from app import app
 from extraction.extraction import extract_ocel
 
-from environment import settings
-
-
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 #start_time_str = dcc.Input(id="start-time", type="text", placeholder="Start time (hh:mm:ss)")
 #end_time_str = dcc.Input(id="end-time", type="text", placeholder="End time (hh:mm:ss)")
-
-
 
 
 # Layout for the file upload component
@@ -95,7 +91,7 @@ layout = html.Div([
                     )
                 ),
             ],
-            id="modal",
+            id="con_config_modal",
             is_open=False,),
         ])
     
@@ -129,63 +125,28 @@ def select_checklist_options(value):
 
 # Callback function to open the modal
 @app.callback(
-    Output("modal", "is_open"),
+    Output("con_config_modal", "is_open"),
     [Input("open", "n_clicks"), Input("close", "n_clicks")],
-    [State("modal", "is_open")],
+    [State("con_config_modal", "is_open")],
 )
 def toggle_modal(n1, n2, is_open):
     if n1 or n2:
         return not is_open
     return is_open
 
-# Help variables to help saving a new parameter
-class HV:
-    param_to_change = None
-    param_new_value = None
-
-# Callback function to select parameter in dropdown menu (modal)
-@app.callback(
-    Output('dd-output-container', 'children'),
-    Input('param-dropdown', 'value')
-)
-def update_output(value):
-    HV.param_to_change = value
-    return f'You have selected: {value}'
-
-# Callback to return input given in modal
-@app.callback(Output("output", "children"), [Input("input", "value")])
-def output_text(value):
-    return f'New value: {value}'
 
 # Callback to save input given in modal
 @app.callback(
     Output('save-output', 'children'),
     Input('save', 'n_clicks'),
+    State('param-dropdown', 'value'),
+    State("input", "value")
 )
-def displayClick(save_btn):
+def change_sap_config(save_btn, selected_param, new_value):
     msg = "Not saved."
     if "save" == ctx.triggered_id:
-        if HV.param_to_change == 'user':
-            settings.SAP_USER = HV.param_new_value
-        if HV.param_to_change == 'passwd':
-            settings.SAP_PASSWD = HV.param_new_value
-        if HV.param_to_change == 'ashost':
-            settings.SAP_ASHOST = HV.param_new_value
-        if HV.param_to_change == 'saprouter':
-            settings.SAP_SAPROUTER = HV.param_new_value
-        if HV.param_to_change == 'msserv':
-            settings.SAP_MSSERV = HV.param_new_value  
-        if HV.param_to_change == 'sysid':
-            settings.SAP_SYSID = HV.param_new_value  
-        if HV.param_to_change == 'group':
-            settings.SAP_GROUP = HV.param_new_value  
-        if HV.param_to_change == 'client':
-            settings.SAP_CLIENT = HV.param_new_value
-        if HV.param_to_change == 'lang':
-            settings.SAP_LANG = HV.param_new_value  
-        if HV.param_to_change == 'trace':
-            settings.SAP_TRACE = HV.param_new_value  
-        msg = f"New value for {HV.param_to_change} saved successfully."
+        log_management.sap_config[selected_param] = new_value
+        msg = f"New value for {selected_param} saved successfully."
     return html.Div(msg)
 
 
