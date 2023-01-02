@@ -25,7 +25,8 @@ layout = html.Div([
         html.H6("Upload or extract log"),
         dcc.Loading(id='loading-extract', children=[
             html.Div([
-                html.Button('Extract from SAP', id='btn-extract', n_clicks=0, style={'width': '100%'}),
+                html.Button('Extract from SAP', id='btn-extract', n_clicks=0, style={'width': '70%'}),
+                html.Button("Config", id="con_config_button", n_clicks=0, style={'width': '30%'}),
                 html.Div(id='container-feedback-text')
             ], style={'width': '100%', 'display': 'inline-block', 'padding': '10px'}),
         ], type='default'),
@@ -69,8 +70,6 @@ layout = html.Div([
     
         # Modal for SAP connection configuration
         html.Div([
-            html.H6("Configure SAP connection configuration"),
-            html.Button("Configure", id="open", n_clicks=0),
             dbc.Modal([
                 dbc.ModalHeader(dbc.ModalTitle("SAP connection configuration")),
                 dbc.ModalBody("Select a parameter to be modified and enter its new value below."),
@@ -126,7 +125,7 @@ def select_checklist_options(value):
 # Callback function to open the modal
 @app.callback(
     Output("con_config_modal", "is_open"),
-    [Input("open", "n_clicks"), Input("close", "n_clicks")],
+    [Input("con_config_button", "n_clicks"), Input("close", "n_clicks")],
     [State("con_config_modal", "is_open")],
 )
 def toggle_modal(n1, n2, is_open):
