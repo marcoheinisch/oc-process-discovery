@@ -12,25 +12,45 @@ class SingletonClass(object):
             cls.instance = super(SingletonClass, cls).__new__(cls)
             # Initialize the data attribute as an empty dictionary
             cls.instance.data = {}
-            cls.instance.selected = None
-            cls.instance.filter_steps = []
-            cls.instance.filter_ocel = None
+            cls.instance.selected = 'example-sap.jsonocel'
         # Return the existing instance of the class
         return cls.instance
 
 class DataManagementSystem:
     @classmethod
-    def store(cls, key, contents):
+    def add_version_control(cls, key):
+        # Get the single instance of the SingletonClass object
+        singleton_instance = SingletonClass()
+        list_key = key + '_filter_list'
+        # Start the list with the original log (and then append new, filtered logs)
+        # Store a separate filtering-list per log
+        list_values = [singleton_instance.data[key]]
+        singleton_instance.data[list_key] = list_values
+
+    @classmethod
+    def store_version_control(cls, key, content):
+        list_key = key + '_filter_list'
+        filter_list = cls.load(list_key)
+        filter_list.append(content)
+    @classmethod
+    def load_version_control(cls, key):
+        list_key = key + '_filter_list'
+        filter_list = cls.load(list_key)
+        return filter_list[len(filter_list) - 1]
+
+    @classmethod
+    def store(cls, key, content):
         """Save content to file and store path in singleton instance"""
         # Get the single instance of the SingletonClass object
         singleton_instance = SingletonClass()
         # Store the data infile and store path in singleton instance
-        data = contents.encode("utf8").split(b";base64,")[1]
+        data = content.encode("utf8").split(b";base64,")[1]
         path = os.path.join(UPLOAD_DIRECTORY, key)
         with open(path, "wb+") as fp:
             fp.write(base64.decodebytes(data))
         singleton_instance.data[key] = path
-       
+        # Add version control for future filtering
+        cls.add_version_control(key)
         
     @classmethod
     def load(cls, key) -> str:
@@ -48,7 +68,7 @@ class DataManagementSystem:
         # Get the single instance of the SingletonClass object
         singleton_instance = SingletonClass()
         # Retrieve the data from the data attribute of the singleton instance
-        return singleton_instance.data.get(singleton_instance.selected)
+        return cls.load_version_control(singleton_instance.selected)
 
     @classmethod
     def delete(cls, key):
@@ -69,12 +89,13 @@ class DataManagementSystem:
         singleton_instance.selected = key
         
     @classmethod
-    def all_keys(cls) -> list[str]:
+    def all_upload_keys(cls) -> list[str]:
         """Get all keys stored in singleton instance"""
         # Get the single instance of the SingletonClass object
         singleton_instance = SingletonClass()
         # Retrieve the data from the data attribute of the singleton instance
-        return list(singleton_instance.data.keys())
+        funct = lambda x: UPLOAD_DIRECTORY in x[1]
+        return dict(list(filter(funct, singleton_instance.data.items()))).keys()
 
     @classmethod
     def register(cls, key, path):
@@ -83,27 +104,8 @@ class DataManagementSystem:
         singleton_instance = SingletonClass()
         # Store the data infile and store path in singleton instance
         singleton_instance.data[key] = path
-        
-    @classmethod
-    def set_filter_steps(cls, steps):
-        """Set filter steps"""
-        singleton_instance = SingletonClass()
-        singleton_instance.filter_steps = steps
-        
-    @classmethod
-    def set_filter_ocel(cls, ocel):
-        """Set filter ocel"""
-        singleton_instance = SingletonClass()
-        singleton_instance.filter_ocel = ocel
-    
-    @classmethod
-    def get_filter_steps(cls):
-        """Get filter steps"""
-        singleton_instance = SingletonClass()
-        return singleton_instance.filter_steps
-    
-    @classmethod
-    def get_filter_ocel(cls):
-        """Get filter ocel"""
-        singleton_instance = SingletonClass()
-        return singleton_instance.filter_ocel
+        # Add version control for future filtering
+        if UPLOAD_DIRECTORY in path:
+            cls.add_version_control(key)
+
+

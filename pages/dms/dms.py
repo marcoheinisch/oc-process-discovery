@@ -5,7 +5,7 @@ from dash.dependencies import Input, Output, State
 from app import log_management
 from app import app
 from extraction.extraction import extract_ocel
-from filtering.filtering import filtering_panel, prepare_for_filtering
+from filtering.filtering import filtering_panel
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -100,8 +100,6 @@ def parse_contents(contents, filename, date): #date is not used yet
               [Input('uploaded-files-checklist', 'value')])
 def select_checklist_options(value):
     log_management.select(value)
-    
-    prepare_for_filtering()
     return 'You have selected "{}" for analysis'.format(value)
 
 #list of uploaded files
@@ -110,7 +108,7 @@ def select_checklist_options(value):
               [Input('output-jsonocel-upload', 'children')],
               [State('uploaded-files-checklist', 'options')])
 def update_checklist_options(v, children, existing_options):
-    options = log_management.all_keys()
+    options = log_management.all_upload_keys()
     if options is None:
         options = []
     updated_options =  [{'label': str(filename), 'value': str(filename)} for filename in options]

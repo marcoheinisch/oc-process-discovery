@@ -12,22 +12,8 @@ from app import app
 from app import log_management
 
 
-# should be triggered by sap extraction callback
-def prepare_for_filtering():
-    original_path = log_management.load_selected()
-    if original_path == None:
-        return
-    log_paths = log_management.get_filter_steps()
-    log_paths.append(copy.deepcopy(original_path))
-    log_management.set_filter_steps(log_paths)
-    ocel = pm4py.read_ocel(get_path())
-    log_management.set_filter_ocel(ocel)
-
-
-
 def get_path():
-    log_paths = log_management.get_filter_steps()
-    return log_paths[len(log_paths) - 1]
+    return log_management.load_selected()
 
 
 def get_ocel() -> OCEL:
@@ -49,11 +35,21 @@ def save_filtered_ocel(ocel):
     log_paths.append(path)
 
 
-prepare_for_filtering()
-
-
 # panel components
+filtering_label = html.Label(
+    id='filtering-label',
+    hidden="hidden",
+    children='Filtering has been succesfully applied!'
+)
+
+
 # Filter on Event Attributes
+event_attribute_label = html.Label(
+    id='event-attribute-label',
+    hidden="hidden",
+    children='Filtering on Event Attributes has been succesfully applied!'
+)
+
 event_attribute_dropdown = dcc.Dropdown(
     id='event-attribute-dropdown',
     options=[{'label': attr, 'value': attr} for attr in get_ocel().events.columns.tolist()],
@@ -109,12 +105,9 @@ object_attribute_positive_radio = dcc.RadioItems(
 def update_event_attribute_checkboxes(keys, children):
     selected_values = {}
     for child in children:
-        print(child)
         key = child['props']['children'][0]['props']['id'].rsplit('-', 1)[0]
         value = child['props']['children'][0]['props']['value']
-        print(key)
         selected_values[key] = value
-        print(value)
 
     checkboxes = []
     for key in keys:
@@ -230,14 +223,58 @@ def rollback(n_clicks):
     return [], [], True, [], [], True"""
 
 
+@app.callback(
+    Output('filter-trigger-1', 'n-clicks'),
+    Input('filter-button', 'n_clicks'),
+)
+def apply_filtering(button_clicks):
+    return button_clicks
+
+
+@app.callback(
+    Output('event-attribute-label', 'hidden'),
+    Output('filter-trigger-2', 'n-clicks'),
+    Input('filter-trigger-1', 'n-clicks'),
+    State('uploaded-files-checklist', 'value'),
+    State('event-attribute-dropdown', 'value'),
+    State('event-attribute-checkboxes', 'children'),
+    State('event-attribute-positive-radio', 'value')
+
+)
+def filter_on_event_attributes(button_clicks, filename, keys, children, positive):
+    if button_clicks is None or button_clicks == 0:
+        return 'hidden', 0
+
+    path = log_management.load_version_control(filename)
+    # log_management.store_version_control(filename, filtered)
+    return None, button_clicks
+
+
+
 # create layout
 filtering_panel = [
+        # initialize filtering triggers
+        html.Button(
+            id='filter-trigger-1',
+            n_clicks=0,
+            hidden=True
+        ),
+        html.Button(
+            id='filter-trigger-2',
+            n_clicks=0,
+            hidden=True
+        ),
+        event_attribute_label,
         event_attribute_dropdown,
         event_attribute_checkboxes,
         event_attribute_positive_radio,
         object_attribute_dropdown,
         object_attribute_checkboxes,
         object_attribute_positive_radio,
-        html.Button('Filter', id='filter-button'),
-        html.Button('Rollback', id='rollback-button')
-    ]
+        html.Button(
+            'Filter', id='filter-button',
+            n_clicks=0,
+        ),
+        html.Button('Rollback', id='rollback-button'),
+        html.Button('Rollback all', id='rollback-all-button')
+]
