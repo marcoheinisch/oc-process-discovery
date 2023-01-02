@@ -236,7 +236,7 @@ def filter_on_event_attributes(button_clicks, filename, keys, children, positive
         return keys, children, positive, 'hidden', 0
 
     # load the most recent version of the file
-    ocel = pm4py.read_ocel(log_management.load_version_control(filename))
+    ocel = log_management.load_version_control(filename)
 
     # load the selected values per each key
     selected_values = {}

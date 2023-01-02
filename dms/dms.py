@@ -35,10 +35,13 @@ class DataManagementSystem:
         filter_list = cls.__load(list_key)
         filter_list.append(ocel)
     @classmethod
-    def load_version_control(cls, key):
+    def load_version_control(cls, key) -> OCEL:
         list_key = key + '_filter_list'
         filter_list = cls.__load(list_key)
-        return filter_list[len(filter_list) - 1]
+        loaded = filter_list[len(filter_list) - 1]
+        if type(loaded) is OCEL:
+            return loaded
+        return pm4py.read_ocel(loaded)
 
     @classmethod
     def store(cls, key, content):
@@ -55,16 +58,14 @@ class DataManagementSystem:
         cls.__add_version_control(key)
         
     @classmethod
-    def __load(cls, key) -> str:
-        """Get path of ocel from key
-        """
+    def __load(cls, key):
         # Get the single instance of the SingletonClass object
         singleton_instance = SingletonClass()
         # Retrieve the data from the data attribute of the singleton instance
-        return singleton_instance.data.get(key)       
+        return singleton_instance.data.get(key)
         
     @classmethod
-    def __load_selected(cls) -> str:
+    def __load_selected(cls) -> OCEL:
         """Get path of selected ocel
         """
         # Get the single instance of the SingletonClass object
@@ -73,10 +74,7 @@ class DataManagementSystem:
         return cls.load_version_control(singleton_instance.selected)
 
     def get_ocel(cls) -> OCEL:
-        selected = cls.__load_selected()
-        if selected is OCEL:
-            return selected
-        return pm4py.read_ocel(selected)
+        return cls.__load_selected()
 
     @classmethod
     def delete(cls, key):
