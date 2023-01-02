@@ -38,7 +38,7 @@ filtering_label = html.Label(
 event_attribute_label = html.Label(
     id='event-attribute-label',
     hidden="hidden",
-    children='Filtering on Event Attributes has been succesfully applied!'
+    children='Filtering on Event Attributes has been successfully applied!'
 )
 
 event_attribute_dropdown = dcc.Dropdown(
@@ -63,6 +63,13 @@ event_attribute_positive_radio = dcc.RadioItems(
 )
 
 # Filter on Object Attributes
+object_attribute_label = html.Label(
+    id='object-attribute-label',
+    hidden="hidden",
+    children='Filtering on Object Attributes has been successfully applied!'
+)
+
+
 object_attribute_dropdown = dcc.Dropdown(
     id='object-attribute-dropdown',
     options=[{'label': attr, 'value': attr} for attr in log_management.get_ocel().objects.columns.tolist()],
@@ -249,11 +256,43 @@ def filter_on_event_attributes(button_clicks, filename, keys, children, positive
     for key in keys:
         if key not in selected_values:
             selected_values[key] = []
-        print('key', key)
-        print('selected_values[key]', selected_values[key])
-        print('ocel', ocel)
         ocel = pm4py.filter_ocel_event_attribute(ocel, key, selected_values[key], positive)
-        print(ocel)
+
+    log_management.store_version_control(filename, ocel)
+    return [], [], True, None, button_clicks
+
+
+@app.callback(
+    Output('object-attribute-dropdown', 'value'),
+    Output('object-attribute-checkboxes', 'children'),
+    Output('object-attribute-positive-radio', 'value'),
+    Output('object-attribute-label', 'hidden'),
+    Output('filter-trigger-3', 'n-clicks'),
+    Input('filter-trigger-2', 'n-clicks'),
+    State('uploaded-files-checklist', 'value'),
+    State('object-attribute-dropdown', 'value'),
+    State('object-attribute-checkboxes', 'children'),
+    State('object-attribute-positive-radio', 'value')
+)
+def filter_on_object_attributes(button_clicks, filename, keys, children, positive):
+    if button_clicks is None or button_clicks == 0:
+        return keys, children, positive, 'hidden', 0
+
+    # load the most recent version of the file
+    ocel = log_management.load_version_control(filename)
+
+    # load the selected values per each key
+    selected_values = {}
+    for child in children:
+        key = child['props']['children'][0]['props']['id'].rsplit('-', 1)[0]
+        value = child['props']['children'][0]['props']['value']
+        selected_values[key] = value
+
+    # apply filtering per key
+    for key in keys:
+        if key not in selected_values:
+            selected_values[key] = []
+        ocel = pm4py.filter_ocel_object_attribute(ocel, key, selected_values[key], positive)
 
     log_management.store_version_control(filename, ocel)
     return [], [], True, None, button_clicks
@@ -271,10 +310,16 @@ filtering_panel = [
             n_clicks=0,
             hidden=True
         ),
+        html.Button(
+            id='filter-trigger-3',
+            n_clicks=0,
+            hidden=True
+        ),
         event_attribute_label,
         event_attribute_dropdown,
         event_attribute_checkboxes,
         event_attribute_positive_radio,
+        object_attribute_label,
         object_attribute_dropdown,
         object_attribute_checkboxes,
         object_attribute_positive_radio,
