@@ -11,6 +11,8 @@ import pm4py
 from app import app
 from app import log_management
 
+from utils.constants import UPLOAD_DIRECTORY
+
 def get_new_path_name():
     log_paths = log_management.get_filter_steps()
     length = len(log_paths)
@@ -27,6 +29,13 @@ def save_filtered_ocel(ocel):
 
 
 # panel components
+save_changes_label = html.Label(
+    id='save-changes-label',
+    hidden="hidden",
+    children='The filtered log has been successfully saved!'
+)
+
+
 filtering_label = html.Label(
     id='filtering-label',
     hidden="hidden",
@@ -225,6 +234,26 @@ def rollback(n_clicks):
 def apply_filtering(button_clicks):
     return button_clicks
 
+@app.callback(
+    Output('save-changes-label', 'hidden'),
+    Output('output-jsonocel-upload', 'children'),
+    Output('uploaded-files-checklist', 'value'),
+    Input('save-changes-button', 'n_clicks'),
+    State('output-jsonocel-upload', 'children'),
+    State('uploaded-files-checklist', 'value'),
+)
+def save_changes(button_clicks, upload_children, filename):
+    if button_clicks is None or button_clicks == 0:
+        return 'hidden', upload_children, filename
+
+    new_filename = filename.rpartition('.jsonocel')[0] + '_filtered.jsonocel'
+    path = os.path.join(UPLOAD_DIRECTORY, new_filename)
+    pm4py.write_ocel(log_management.get_ocel(), path)
+    log_management.register(new_filename, path)
+
+    log_management.reset_to_original(filename)
+
+    return None, upload_children, new_filename
 
 @app.callback(
     Output('event-attribute-dropdown', 'value'),
@@ -251,6 +280,9 @@ def filter_on_event_attributes(button_clicks, filename, keys, children, positive
         key = child['props']['children'][0]['props']['id'].rsplit('-', 1)[0]
         value = child['props']['children'][0]['props']['value']
         selected_values[key] = value
+
+    if not keys:
+        return [], [], True, 'hidden', button_clicks
 
     # apply filtering per key
     for key in keys:
@@ -288,6 +320,9 @@ def filter_on_object_attributes(button_clicks, filename, keys, children, positiv
         value = child['props']['children'][0]['props']['value']
         selected_values[key] = value
 
+    if not keys:
+        return [], [], True, 'hidden', button_clicks
+
     # apply filtering per key
     for key in keys:
         if key not in selected_values:
@@ -324,9 +359,25 @@ filtering_panel = [
         object_attribute_checkboxes,
         object_attribute_positive_radio,
         html.Button(
-            'Filter', id='filter-button',
+            'Filter',
+            id='filter-button',
             n_clicks=0,
         ),
-        html.Button('Rollback', id='rollback-button'),
-        html.Button('Rollback all', id='rollback-all-button')
+        html.Button(
+            'Rollback',
+            id='rollback-button',
+            n_clicks=0,
+        ),
+        html.Button(
+            'Rollback all',
+            id='rollback-all-button',
+            n_clicks=0,
+        ),
+        html.Button(
+            'Save changes',
+            id='save-changes-button',
+            n_clicks=0,
+        ),
+        filtering_label,
+        save_changes_label,
 ]

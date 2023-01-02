@@ -114,4 +114,11 @@ class DataManagementSystem:
         if UPLOAD_DIRECTORY in path:
             cls.__add_version_control(key)
 
+    def reset_to_original(cls, key):
+        singleton_instance = SingletonClass()
+        list_key = key + '_filter_list'
+        singleton_instance.data[list_key] = [singleton_instance.data[list_key][0]]
+
+
+
 
