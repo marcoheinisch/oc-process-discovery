@@ -236,7 +236,6 @@ def extract_ocel() -> str:
             return "Could not log in. Wrong credentials?"
         except Exception as e:
             return "An error occurred: {}".format(type(e).__name__)
-        tables = get_tables_from_sap(sap_con)
         #sql_con = SqlLiteConnection()
         #sql_con.push_tables(tables)
     else:
