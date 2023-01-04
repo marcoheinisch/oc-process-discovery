@@ -72,18 +72,22 @@ layout = html.Div([
         html.Div([
             dbc.Modal([
                 dbc.ModalHeader(dbc.ModalTitle("SAP connection configuration")),
-                dbc.ModalBody("Select a parameter to be modified and enter its new value below."),
-                dcc.Dropdown(['user', 'passwd', 'ashost', 'saprouter', 'msserv', 'sysid', 'group', 'client', 'lang', 'trace'], 'user', id='param-dropdown'),
-                html.Div(id='dd-output-container'),
-                html.Div([
-                    dbc.Input(id="input", placeholder="Enter new value.", type="text"),
-                    html.P(id="output"),
+                dbc.ModalBody([
+                    html.P("Select a parameter to be modified and enter its new value below."),
+                    dcc.Dropdown(['user', 'passwd', 'ashost', 'saprouter', 'msserv', 'sysid', 'group', 'client', 'lang', 'trace'], 'user', id='param-dropdown'),
+                    html.Div(id='dd-output-container'),
+                    html.Div([
+                        dbc.Input(id="input", placeholder="Enter new value.", type="text"),
+                        html.P(id="output"),
+                    ]),
+                    html.Button(
+                        "Save", id="save", n_clicks=0
+                    ),
+                    html.Div(id='save-output'),
+                    html.Br(),
+                    dcc.Checklist(id="options_checklist", options=['Use SQLite3 database instead SAP']),
+                    html.Div(id='options_checklist_output', style={"display":"none"}),
                 ]),
-                html.Button(
-                    "Save", id="save", n_clicks=0
-                ),
-                html.Div(id='save-output'),
-                html.Br(),
                 dbc.ModalFooter(
                     dbc.Button(
                         "Close", id="close", className="ms-auto", n_clicks=0
@@ -115,12 +119,14 @@ def parse_contents(contents, filename, date): #date is not used yet
         'File {} successfully uploaded'.format(filename)
     ])
 
+
 # Callback function to mark a file for the analysis
 @app.callback(Output('uploaded-files-checklist', 'children'), 
               [Input('uploaded-files-checklist', 'value')])
 def select_checklist_options(value):
     log_management.select(value)
     return '  You have selected "{}" for analysis'.format(value)
+
 
 # Callback function to open the modal
 @app.callback(
@@ -133,6 +139,17 @@ def toggle_modal(n1, n2, is_open):
         return not is_open
     return is_open
 
+# Callback to display selected parameter in options_checklist
+@app.callback(
+    Output('options_checklist_output', 'children'),
+    Output('btn-extract', "children"),
+    Input('options_checklist', 'value'),
+)
+def update_config(value):
+    selected = value and (len(value) > 0)
+    log_management.use_sqlite = selected
+    button_value = "Extract from SAP" if not selected else "Extract from SQLite"
+    return value, button_value
 
 # Callback to save input given in modal
 @app.callback(

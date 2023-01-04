@@ -31,6 +31,7 @@ class DataManagementSystem:
         'lang': '',
         'trace': ''
     }
+    use_sqlite = False
     
     @classmethod
     def store(cls, key, contents):

@@ -7,6 +7,7 @@ from datetime import datetime
 from utils import constants
 from utils.constants import VBTYP_DESCRIPTIONS, UPLOAD_DIRECTORY, OBJECTCLAS_DESCRIPTIONS, REGEX_ALPHANUMERIC
 from utils.sap_con import SapConnector
+from utils.sql_con import SqlLiteConnection
 from app import log_management
 
 
@@ -217,31 +218,42 @@ def get_tables_from_sap(sap_con) -> dict[str, pd.DataFrame]:
 def extract_ocel() -> str:
     """Method used by 'extract' button at dms page (gui).
     Returns: extraction status or error message."""
-    try:
-        from pyrfc import Connection, ABAPApplicationError, ABAPRuntimeError, LogonError, CommunicationError
-    except ImportError:
-        return "Application Error: PyRFC not installed"
     
-    try:
-        # import parameters here to ensure that they are updated when the user changes them
-        SAP_CON_PARAMS = log_management.sap_config
-        sap_con = SapConnector(SAP_CON_PARAMS)
-        tables = get_tables_from_sap(sap_con)
-        del sap_con
-    except CommunicationError:
-        return "Could not connect to server."
-    except LogonError:
-        return "Could not log in. Wrong credentials?"
-    except Exception as e:
-        error_class = type(e).__name__
-        return "An error occurred: {}".format(error_class)
+    use_sqlite = log_management.use_sqlite
     
+    if not use_sqlite:
+        try:
+            from pyrfc import Connection, ABAPApplicationError, ABAPRuntimeError, LogonError, CommunicationError
+            SAP_CON_PARAMS = log_management.sap_config
+            sap_con = SapConnector(SAP_CON_PARAMS)
+            tables = get_tables_from_sap(sap_con)
+            del sap_con
+        except ImportError:
+            return "Application Error: PyRFC not installed"
+        except CommunicationError:
+            return "Could not connect to server."
+        except LogonError:
+            return "Could not log in. Wrong credentials?"
+        except Exception as e:
+            return "An error occurred: {}".format(type(e).__name__)
+        #sql_con = SqlLiteConnection()
+        #sql_con.push_tables(tables)
+    else:
+        sql_con = SqlLiteConnection()
+        tables = sql_con.get_tables()
+        
     log = extract_jsonocel(tables)
-    log_name = "extracted_at_{}.jsonocel".format(datetime.now().strftime("%y%m%d_%H%M%S"))
+    
+    if not use_sqlite:
+        log_name = "extracted_at_{}.jsonocel".format(datetime.now().strftime("%y%m%d_%H%M%S"))
+    else:
+        log_name = "sql_at_{}.jsonocel".format(datetime.now().strftime("%y%m%d_%H%M%S"))
+
     log_path = os.path.join(UPLOAD_DIRECTORY, log_name)
     
     dump_jsonocel(log, file_path=log_path)
     log_management.register(log_name, log_path)
+    
     return "Extraction successful."
 
 
