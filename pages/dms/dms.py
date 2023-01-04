@@ -1,18 +1,17 @@
 from datetime import date
+import os
 from dash import Dash, dcc, html, ctx
 from dash.dependencies import Input, Output, State
+import dash_bootstrap_components as dbc
 
 from app import log_management
 from app import app
 from extraction.extraction import extract_ocel
 
-
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 #start_time_str = dcc.Input(id="start-time", type="text", placeholder="Start time (hh:mm:ss)")
 #end_time_str = dcc.Input(id="end-time", type="text", placeholder="End time (hh:mm:ss)")
-
-
 
 
 # Layout for the file upload component
@@ -26,7 +25,8 @@ layout = html.Div([
         html.H6("Upload or extract log"),
         dcc.Loading(id='loading-extract', children=[
             html.Div([
-                html.Button('Extract from SAP', id='btn-extract', n_clicks=0, style={'width': '100%'}),
+                html.Button('Extract from SAP', id='btn-extract', n_clicks=0, style={'width': '70%'}),
+                html.Button("Config", id="con_config_button", n_clicks=0, style={'width': '30%'}),
                 html.Div(id='container-feedback-text')
             ], style={'width': '100%', 'display': 'inline-block', 'padding': '10px'}),
         ], type='default'),
@@ -67,12 +67,37 @@ layout = html.Div([
             html.Button("Download", id="download-button", n_clicks=0, style={'width': '50%'}),
             dcc.Download(id="download-file"),
         ], style={'width': '100%', 'display': 'inline-block', 'vertical-align': 'top', 'padding': '10px'}),
+    
+        # Modal for SAP connection configuration
+        html.Div([
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle("SAP connection configuration")),
+                dbc.ModalBody("Select a parameter to be modified and enter its new value below."),
+                dcc.Dropdown(['user', 'passwd', 'ashost', 'saprouter', 'msserv', 'sysid', 'group', 'client', 'lang', 'trace'], 'user', id='param-dropdown'),
+                html.Div(id='dd-output-container'),
+                html.Div([
+                    dbc.Input(id="input", placeholder="Enter new value.", type="text"),
+                    html.P(id="output"),
+                ]),
+                html.Button(
+                    "Save", id="save", n_clicks=0
+                ),
+                html.Div(id='save-output'),
+                html.Br(),
+                dbc.ModalFooter(
+                    dbc.Button(
+                        "Close", id="close", className="ms-auto", n_clicks=0
+                    )
+                ),
+            ],
+            id="con_config_modal",
+            is_open=False,),
+        ])
+    
     # Global dms div
     ], style={'width': '40%', 'display': 'inline-block', 'padding': '10px'}),
+
 ])
-
-
-    
 
 
 # Callback function to store the contents of the uploaded file
@@ -95,7 +120,34 @@ def parse_contents(contents, filename, date): #date is not used yet
               [Input('uploaded-files-checklist', 'value')])
 def select_checklist_options(value):
     log_management.select(value)
-    return 'You have selected "{}" for analysis'.format(value)
+    return '  You have selected "{}" for analysis'.format(value)
+
+# Callback function to open the modal
+@app.callback(
+    Output("con_config_modal", "is_open"),
+    [Input("con_config_button", "n_clicks"), Input("close", "n_clicks")],
+    [State("con_config_modal", "is_open")],
+)
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+
+# Callback to save input given in modal
+@app.callback(
+    Output('save-output', 'children'),
+    Input('save', 'n_clicks'),
+    State('param-dropdown', 'value'),
+    State("input", "value")
+)
+def change_sap_config(save_btn, selected_param, new_value):
+    msg = "Not saved."
+    if "save" == ctx.triggered_id:
+        log_management.sap_config[selected_param] = new_value
+        msg = f"New value for {selected_param} saved successfully."
+    return html.Div(msg)
+
 
 #list of uploaded files
 @app.callback(Output('uploaded-files-checklist', 'options'),

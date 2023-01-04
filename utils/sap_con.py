@@ -2,9 +2,10 @@ try:
     from pyrfc import Connection, ABAPApplicationError, ABAPRuntimeError, LogonError, CommunicationError
 except ImportError:
     print("You do not have pyrfc installed! You can not use the SAP Connector functionality!")
-from environment.settings import SAP_CON_PARAMS
 
 class SapConnector:
+    conn = None
+    
     def __init__(self, conn_params):
         print("Initialize SAP Connector")
         try:
@@ -80,21 +81,3 @@ class SapConnector:
         """ Function to get the connection details of a session with the SAP system """
         return self.conn.call("STFC_CONNECTION")['RESPTEXT']
 
-    def check_conn(user, password):
-        conn_params = SAP_CON_PARAMS
-        conn_params['user'] = user
-        conn_params['passwd'] = password
-        try:
-            conn = Connection(**conn_params)
-            print("SAP connection successful")
-            return None
-            # Handle errors
-        except CommunicationError:
-            print("Could not connect to server.")
-            return "Could not connect to server. Try activating your IP: https://remotelogin.sapucc.in.tum.de/"
-        except LogonError:
-            print("Could not log in. Wrong credentials?")
-            return "Could not log in. Wrong credentials?"
-        except (ABAPApplicationError, ABAPRuntimeError):
-            print("An error occurred.")
-            return "An error occurred."

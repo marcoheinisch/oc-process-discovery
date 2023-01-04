@@ -7,7 +7,6 @@ from datetime import datetime
 from utils import constants
 from utils.constants import VBTYP_DESCRIPTIONS, UPLOAD_DIRECTORY, OBJECTCLAS_DESCRIPTIONS, REGEX_ALPHANUMERIC
 from utils.sap_con import SapConnector
-from environment.settings import SAP_CON_PARAMS
 from app import log_management
 
 
@@ -224,16 +223,18 @@ def extract_ocel() -> str:
         return "Application Error: PyRFC not installed"
     
     try:
+        # import parameters here to ensure that they are updated when the user changes them
+        SAP_CON_PARAMS = log_management.sap_config
         sap_con = SapConnector(SAP_CON_PARAMS)
+        tables = get_tables_from_sap(sap_con)
+        del sap_con
     except CommunicationError:
         return "Could not connect to server."
     except LogonError:
         return "Could not log in. Wrong credentials?"
-    except (ABAPApplicationError, ABAPRuntimeError):
-        return "An error occurred."
-    
-    tables = get_tables_from_sap(sap_con)
-    del sap_con
+    except Exception as e:
+        error_class = type(e).__name__
+        return "An error occurred: {}".format(error_class)
     
     log = extract_jsonocel(tables)
     log_name = "extracted_at_{}.jsonocel".format(datetime.now().strftime("%y%m%d_%H%M%S"))
