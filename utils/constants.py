@@ -14,7 +14,7 @@ sqlite_path = 'data/internal_sqlite.db'
 
 # Number of rows that are downloaded in each call by the NWRFC library.
 ROWS_AT_A_TIME = 3000
-
+REGEX_ALPHANUMERIC = '[^a-zA-Z0-9]'
 # The following tables with given fields get downloaded from the SAP system into the local database.
 # Number shows how many of the following fields are in the primary key.
 tables = {

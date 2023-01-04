@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
-                "ENVIRONMENT_FILE": ".env.development"
+                "ENVIRONMENT_FILE": ".env"
             }
         },
         {
@@ -21,7 +21,7 @@
             "program": "index.py",
             "console": "integratedTerminal",
             "env": {
-                "ENVIRONMENT_FILE": ".env.development"
+                "ENVIRONMENT_FILE": ".env"
             }
         }
     ]
