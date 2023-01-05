@@ -30,22 +30,12 @@ def ocpa_discover():
     return dot
 
 def pm4py_discover():
-    # delete those two lines later on (only for testing purposes until a proper ocel extraction and data management interfaces are in place
-    print(1)
-    filename = log_management.load_selected()
-    print(2)
-    ocel = pm4py.read_ocel(file_path=filename)
-    print(3)
+    ocel = log_management.get_ocel()
     ocpn = pm4py.discover_oc_petri_net(ocel)
-    print(4)
     pm4py.save_vis_ocpn(ocpn, "data/results/oc_petri_net_pm4py.png")
-    print(5)
     from pm4py.visualization.ocel.ocpn import visualizer as ocpn_visualizer
-    print(6)
     gviz = ocpn_visualizer.apply(ocpn)
-    print(7)
     dot = gviz.source
-    print(8)
     return dot
 
 def dfg_discover():
