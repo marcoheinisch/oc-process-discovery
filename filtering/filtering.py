@@ -12,6 +12,7 @@ from app import app
 from app import log_management
 
 from utils.constants import UPLOAD_DIRECTORY
+import dms.dms
 
 def get_new_path_name():
     log_paths = log_management.get_filter_steps()
@@ -198,33 +199,35 @@ def update_object_attribute_positive_flag(value):
     return value
 
 
-"""# define callback for rollback
+# define callback for rollback
 @app.callback(
-    [
-        Output('event-attribute-dropdown', 'value'),
-        Output('event-attribute-checkboxes', 'value'),
-        Output('event-attribute-positive-radio', 'value'),
-        Output('object_attribute_dropdown', 'value'),
-        Output('object-attribute-checkboxes', 'value'),
-        Output('object-attribute-positive-radio', 'value'),
-    ],
-    Input('rollback-button', 'n_clicks')
+    Output('uploaded-files-checklist', 'value'),
+    Input('rollback-button', 'n_clicks'),
 )
-def rollback(n_clicks):
-    path = get_path()
-    # don't do the rollback if no filtering has been done
-    if path == original_path:
-        return
-    # delete current filtered ocel file
-    os.remove(get_path())
-    del log_paths[len(log_paths) - 1]
+def rollback(button_clicks):
+    singleton_instance = dms.dms.SingletonClass()
+    selected = singleton_instance.selected
 
-    # update the current ocel
-    global ocel
-    ocel = pm4py.read_ocel(get_path())
+    if button_clicks is None or button_clicks == 0:
+        return selected
 
-    # reset filtering options to default values
-    return [], [], True, [], [], True"""
+    log_management.rollback()
+    return selected
+
+# define callback for rollback_all
+@app.callback(
+    Output('uploaded-files-checklist', 'value'),
+    Input('rollback-all-button', 'n_clicks'),
+)
+def rollback_all(button_clicks):
+    singleton_instance = dms.dms.SingletonClass()
+    selected = singleton_instance.selected
+
+    if button_clicks is None or button_clicks == 0:
+        return selected
+
+    log_management.rollback_all()
+    return selected
 
 
 @app.callback(

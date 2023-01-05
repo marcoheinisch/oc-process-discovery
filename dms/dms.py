@@ -73,6 +73,7 @@ class DataManagementSystem:
         # Retrieve the data from the data attribute of the singleton instance
         return cls.load_version_control(singleton_instance.selected)
 
+    @classmethod
     def get_ocel(cls) -> OCEL:
         return cls.__load_selected()
 
@@ -114,10 +115,29 @@ class DataManagementSystem:
         if UPLOAD_DIRECTORY in path:
             cls.__add_version_control(key)
 
-    def reset_to_original(cls, key):
+    @staticmethod
+    def reset_to_original(key):
         singleton_instance = SingletonClass()
         list_key = key + '_filter_list'
         singleton_instance.data[list_key] = [singleton_instance.data[list_key][0]]
+
+    @classmethod
+    def rollback(cls):
+        singleton_instance = SingletonClass()
+        list_key = singleton_instance.selected + '_filter_list'
+        filter_list = cls.__load(list_key)
+        if len(filter_list) > 1:
+            filter_list.pop()
+
+    @classmethod
+    def rollback_all(cls):
+        singleton_instance = SingletonClass()
+        list_key = singleton_instance.selected + '_filter_list'
+        filter_list = cls.__load(list_key)
+        while len(filter_list) > 1:
+            filter_list.pop()
+
+
 
 
 
