@@ -1,4 +1,7 @@
 import warnings
+import dms.dms
+from utils.constants import UPLOAD_DIRECTORY
+import os
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -16,6 +19,11 @@ from app import log_management
 
 def ocpa_discover():
     ocel = log_management.get_ocel()
+    singleton_instance = dms.dms.SingletonClass()
+    key = singleton_instance.selected
+    filename = os.path.join(UPLOAD_DIRECTORY, key.rpartition('.jsonocel')[0] + '_temporary.jsonocel')
+    pm4py.write_ocel(ocel, filename)
+    ocel = ocel_import_factory.apply(filename)
     ocpn = ocpn_discovery_factory.apply(ocel, parameters={"debug": False})
     ocpn_vis_factory.save(ocpn_vis_factory.apply(ocpn), "data/results/oc_petri_net_ocpa.png")
     dot = ocpn_vis_factory.apply(ocpn).source
