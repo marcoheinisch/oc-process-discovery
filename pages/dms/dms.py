@@ -63,7 +63,7 @@ layout = html.Div([
             #html.Div(html.B("Your files")),
             dcc.RadioItems(id='uploaded-files-checklist', options=[], style={'width': '100%'}),
             # Delete button
-            html.Button(id='delete-file-button', children='Delete', style={'width': '50%'}),
+            html.Button(id='delete-file-button', children='Delete', style={'width': '50%'}, n_clicks=0),
             # Download button
             html.Button("Download", id="download-button", n_clicks=0, style={'width': '50%'}),
             dcc.Download(id="download-file"),

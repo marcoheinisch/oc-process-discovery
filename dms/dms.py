@@ -77,18 +77,6 @@ class DataManagementSystem:
     @classmethod
     def get_ocel(cls) -> OCEL:
         return cls.__load_selected()
-
-    @classmethod
-    def delete(cls, key):
-        """NOT IMPLEMENTED: Delete ocel from key and from filesystem"""
-        # Get the single instance of the SingletonClass object
-        singleton_instance = SingletonClass()
-        # Retrieve the data from the data attribute of the singleton instance
-        if key in singleton_instance.data:
-            #todo delete file
-            del singleton_instance.data[key]
-        else:
-            raise Warning("Key not found in DataManagement. Cannot delete.")
         
     @classmethod
     def select(cls, key):
@@ -147,6 +135,24 @@ class DataManagementSystem:
                     "data/uploads/example_order_process.jsonocel")
         self.register("example_order_process.jsonocel", "data/uploads/example_order_process.jsonocel")
         self.select("example_order_process.jsonocel")
+
+    def delete_selected(self):
+        singleton_instance = SingletonClass()
+        if len(self.all_upload_keys()) == 1:
+            raise Exception
+        else:
+            key = singleton_instance.selected
+            data = singleton_instance.data
+            list_key = key + '_filter_list'
+            del data[list_key]
+            os.remove(data[key])
+            del data[key]
+            for key in data.keys():
+                self.select(key)
+                break
+
+
+
 
 
 

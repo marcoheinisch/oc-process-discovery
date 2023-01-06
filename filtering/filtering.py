@@ -30,6 +30,12 @@ filtering_label = html.Label(
     children='Filtering has been succesfully applied!'
 )
 
+delete_file_label = html.Label(
+    id='delete-file-label',
+    hidden="hidden",
+    children='The selected file has been succesfully deleted!'
+)
+
 
 # Filter on Event Attributes
 event_attribute_label = html.Label(
@@ -261,7 +267,7 @@ def go_to_analysis(button_clicks, pathname):
     Input('go-to-dms-button', 'n_clicks'),
     State("url", "pathname")
 )
-def go_to_analysis(button_clicks, pathname):
+def go_to_dms(button_clicks, pathname):
     if button_clicks is None or button_clicks == 0:
         return pathname
     else:
@@ -281,6 +287,28 @@ def clear(button_clicks, children):
         log_management.clear()
         selected = dms.dms.SingletonClass().selected
         return children, selected
+
+@app.callback(
+    Output('container-feedback-text', 'children'),
+    Output('uploaded-files-checklist', 'value'),
+    Output('save-changes-label', 'hidden'),
+    Output('save-changes-label', 'children'),
+    Input('delete-file-button', 'n_clicks'),
+    State('container-feedback-text', 'children'),
+)
+def delete(button_clicks, children):
+    if button_clicks is None or button_clicks == 0:
+        selected = dms.dms.SingletonClass().selected
+        return children, selected, 'hidden', 'The selected file has been succesfully deleted!'
+    else:
+        message = 'The selected file has been succesfully deleted!'
+        try:
+            log_management.delete_selected()
+        except Exception:
+            message = "Cannot delete the only file left!"
+            pass
+        selected = dms.dms.SingletonClass().selected
+        return children, selected, None, message
 
 
 @app.callback(
@@ -418,4 +446,5 @@ filtering_panel = [
         ),
         filtering_label,
         save_changes_label,
+        delete_file_label,
 ]
