@@ -1,4 +1,6 @@
 from datetime import date
+
+import dash
 from dash import Dash, dcc, html, ctx
 from dash_extensions.enrich import Output, Input, State
 
@@ -6,7 +8,10 @@ from app import log_management
 from app import app
 from extraction.extraction import extract_ocel
 from filtering.filtering import filtering_panel
-
+import os
+import dms
+from utils.constants import UPLOAD_DIRECTORY
+import pm4py
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -66,7 +71,7 @@ layout = html.Div([
             html.Button(id='delete-file-button', children='Delete', style={'width': '50%'}, n_clicks=0),
             # Download button
             html.Button("Download", id="download-button", n_clicks=0, style={'width': '50%'}),
-            dcc.Download(id="download-file"),
+            dcc.Download(id="download-file", base64=True),
         ], style={'width': '100%', 'display': 'inline-block', 'vertical-align': 'top'}),
         
         html.Div([
@@ -144,3 +149,18 @@ def extract_from_sap(btn1):
 
 if __name__ == '__main__': #only run if this file is called directly
     app.run_server(debug=True) #enables debug mode
+
+@app.callback(
+    Output("download-file", 'data'),
+    Input("download-button", 'n_clicks'),
+    State('uploaded-files-checklist', 'value'),
+)
+def download(button_clicks, filename):
+    if button_clicks is None or button_clicks == 0:
+        return dash.no_update
+    ocel = log_management.get_ocel()
+    singleton_instance = dms.dms.SingletonClass()
+    key = singleton_instance.selected
+    filename = os.path.join(UPLOAD_DIRECTORY, key.rpartition('.jsonocel')[0] + '_downloaded.jsonocel')
+    pm4py.write_ocel(ocel, filename)
+    return dcc.send_file(filename)
