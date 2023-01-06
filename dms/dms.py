@@ -4,6 +4,7 @@ from pm4py.objects.ocel.obj import OCEL
 import pm4py
 
 from utils.constants import UPLOAD_DIRECTORY
+import shutil
 
 class SingletonClass(object):
     # Override the default __new__ method to create a single instance of the class
@@ -136,6 +137,16 @@ class DataManagementSystem:
         filter_list = cls.__load(list_key)
         while len(filter_list) > 1:
             filter_list.pop()
+
+    def clear(self):
+        if os.path.exists("data/uploads"):
+            shutil.rmtree("data/uploads")
+        SingletonClass().data = {}
+        os.mkdir("data/uploads")
+        shutil.copy("data/resources/initial/example_order_process.jsonocel",
+                    "data/uploads/example_order_process.jsonocel")
+        self.register("example_order_process.jsonocel", "data/uploads/example_order_process.jsonocel")
+        self.select("example_order_process.jsonocel")
 
 
 

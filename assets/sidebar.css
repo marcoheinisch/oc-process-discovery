@@ -29,6 +29,12 @@
   display: none;
 }
 
+#go-to-dms-button {
+  display: block;
+  align: center;
+  width: 100%;
+}
+
 #sidebar-toggle {
   display: none;
 }

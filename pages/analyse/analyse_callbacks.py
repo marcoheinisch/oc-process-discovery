@@ -24,3 +24,4 @@ def discover_process_model(apda):
         return pm4py_discover()
     elif apda == "dfg":
         return dfg_discover()
+

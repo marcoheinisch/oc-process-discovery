@@ -89,6 +89,26 @@ sidebar = html.Div(
             options,
             id="pm-collapse",
         ),
+        html.Div(
+            [
+                html.Hr(
+                    style={
+                        "border-top": "solid white"
+                    },
+                    id="pm-hr"
+                ),
+                html.Button(
+                    'Go back to dms',
+                    style={
+                        "background-color": "white",
+                    },
+                    id='go-to-dms-button',
+                    n_clicks=0,
+                ),
+            ],
+            id="pm-go-back-to-dms",
+        ),
+
     ],
     id="pm-sidebar",
 )

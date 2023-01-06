@@ -13,22 +13,7 @@ from app import log_management
 
 from utils.constants import UPLOAD_DIRECTORY
 import dms.dms
-from utils.constants import analyse_page_location
-
-
-def get_new_path_name():
-    log_paths = log_management.get_filter_steps()
-    length = len(log_paths)
-    if length == 1:
-        return 'test/filtered_ocel.json'
-    else:
-        return 'test/filtered_ocel{}.json'.format(length - 1)
-
-def save_filtered_ocel(ocel):
-    path = get_new_path_name()
-    pm4py.write_ocel(ocel, path)
-    log_paths = log_management.get_filter_steps()
-    log_paths.append(path)
+from utils.constants import analyse_page_location, dms_page_location
 
 
 # panel components
@@ -271,6 +256,32 @@ def go_to_analysis(button_clicks, pathname):
     else:
         return analyse_page_location
 
+@app.callback(
+    Output("url", "pathname"),
+    Input('go-to-dms-button', 'n_clicks'),
+    State("url", "pathname")
+)
+def go_to_analysis(button_clicks, pathname):
+    if button_clicks is None or button_clicks == 0:
+        return pathname
+    else:
+        return dms_page_location
+
+@app.callback(
+    Output('container-feedback-text', 'children'),
+    Output('uploaded-files-checklist', 'value'),
+    Input('clear-button', 'n_clicks'),
+    State('container-feedback-text', 'children'),
+)
+def clear(button_clicks, children):
+    if button_clicks is None or button_clicks == 0:
+        selected = dms.dms.SingletonClass().selected
+        return children, selected
+    else:
+        log_management.clear()
+        selected = dms.dms.SingletonClass().selected
+        return children, selected
+
 
 @app.callback(
     Output('event-attribute-dropdown', 'value'),
@@ -398,6 +409,11 @@ filtering_panel = [
         html.Button(
             'Go to analysis',
             id='go-to-analysis-button',
+            n_clicks=0,
+        ),
+        html.Button(
+            'Clear all',
+            id='clear-button',
             n_clicks=0,
         ),
         filtering_label,

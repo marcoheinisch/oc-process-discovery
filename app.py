@@ -1,3 +1,5 @@
+import os.path
+
 import dash
 import dash_bootstrap_components as dbc
 import diskcache
@@ -42,11 +44,8 @@ cache = Cache(app.server, config={
     'CACHE_DIR': 'cache-directory'
 })
 
-shutil.copy("data/resources/initial/example_order_process.jsonocel" , "data/uploads/example_order_process.jsonocel")
-
 log_management = DataManagementSystem()
-log_management.register("example_order_process.jsonocel", "data/uploads/example_order_process.jsonocel")
-log_management.select("example_order_process.jsonocel")
+log_management.clear()
 
 app.layout = layout
 
