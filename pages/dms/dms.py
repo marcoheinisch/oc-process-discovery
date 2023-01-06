@@ -87,18 +87,22 @@ layout = html.Div([
 
 # Callback function to store the contents of the uploaded file
 @app.callback(Output('output-jsonocel-upload', 'children'),
+              Output('uploaded-files-checklist', 'value'),
               [Input('upload-jsonocel', 'contents')],
               [State('upload-jsonocel', 'filename'),
-               State('upload-jsonocel', 'last_modified')])
+               State('upload-jsonocel', 'last_modified'),
+               State('uploaded-files-checklist', 'value')])
 #store the contents of an uploaded file(s) and display a message indicating the file(s) was successfully uploaded
-def parse_contents(contents, filename, date): #date is not used yet
+def parse_contents(contents, filename, date, selected): #date is not used yet
     if contents is None:
-        return "No files uploaded"
+        return "No files uploaded", selected
     for i in range(len(contents)):
         log_management.store(filename[i], contents[i])
+    if len(contents) == 1:
+        selected = filename[0]
     return html.Div([
         'File {} successfully uploaded'.format(filename)
-    ])
+    ]), selected
 
 # Callback function to mark a file for the analysis
 @app.callback(Output('uploaded-files-checklist', 'children'), 
