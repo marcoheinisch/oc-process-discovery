@@ -30,6 +30,12 @@ filtering_label = html.Label(
     children='Filtering has been succesfully applied!'
 )
 
+clear_label = html.Label(
+    id='clear-label',
+    hidden="hidden",
+    children='The uploaded files and their filtered versions have been succesfully cleared!'
+)
+
 delete_file_label = html.Label(
     id='delete-file-label',
     hidden="hidden",
@@ -276,17 +282,18 @@ def go_to_dms(button_clicks, pathname):
 @app.callback(
     Output('container-feedback-text', 'children'),
     Output('uploaded-files-checklist', 'value'),
+    Output('clear-label', 'hidden'),
     Input('clear-button', 'n_clicks'),
     State('container-feedback-text', 'children'),
 )
 def clear(button_clicks, children):
     if button_clicks is None or button_clicks == 0:
         selected = dms.dms.SingletonClass().selected
-        return children, selected
+        return children, selected, 'hidden'
     else:
         log_management.clear()
         selected = dms.dms.SingletonClass().selected
-        return children, selected
+        return children, selected, None
 
 @app.callback(
     Output('container-feedback-text', 'children'),
@@ -446,5 +453,6 @@ filtering_panel = [
         ),
         filtering_label,
         save_changes_label,
+        clear_label,
         delete_file_label,
 ]

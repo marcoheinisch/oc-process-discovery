@@ -55,11 +55,10 @@ options = dbc.Card(
                     options=[
                         {"label": row[0], "value": row[1]} for row in apdas
                     ],
-                    value="AM",
+                    value="pm4py",
                     clearable=False,
                     optionHeight=80,
                     searchable=True,
-
                 ),
             ],
         ),
