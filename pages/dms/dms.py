@@ -97,6 +97,7 @@ def parse_contents(contents, filename, date, selected): #date is not used yet
     if contents is None:
         return "No files uploaded", selected
     for i in range(len(contents)):
+        filename[i] = log_management.get_a_unique_filename(filename[i])
         log_management.store(filename[i], contents[i])
     if len(contents) == 1:
         selected = filename[0]

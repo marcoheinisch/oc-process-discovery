@@ -96,6 +96,7 @@ class DataManagementSystem:
     @classmethod
     def register(cls, key, path):
         """Store already existing ocel path in singleton instance"""
+        key = cls.get_a_unique_filename(key)
         # Get the single instance of the SingletonClass object
         singleton_instance = SingletonClass()
         # Store the data infile and store path in singleton instance
@@ -150,6 +151,24 @@ class DataManagementSystem:
             for key in data.keys():
                 self.select(key)
                 break
+
+    @staticmethod
+    def get_a_unique_filename(key) -> str:
+        if key is None:
+            return key
+        if key.endswith('_filter_list'):
+            key = key + '_'
+        data = SingletonClass().data
+        if key not in data:
+            return key
+
+        i = 1
+        key = key.rpartition('.jsonocel')[0] + '(1)' + '.jsonocel'
+        while key in data:
+            i = i + 1
+            key = key.rpartition('(')[0] + '(' + str(i) + ')' + '.jsonocel'
+        return key
+
 
 
 
