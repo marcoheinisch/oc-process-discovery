@@ -11,6 +11,7 @@ from uuid import uuid4
 from dash_extensions.enrich import Output, DashProxy, Input, State, MultiplexerTransform
 
 import flask
+import shutil
 
 
 server = flask.Flask(__name__) # define flask app.server
@@ -41,9 +42,11 @@ cache = Cache(app.server, config={
     'CACHE_DIR': 'cache-directory'
 })
 
+shutil.copy("data/resources/initial/example_order_process.jsonocel" , "data/uploads/example_order_process.jsonocel")
+
 log_management = DataManagementSystem()
-log_management.register("example-sap.jsonocel", "data/uploads/example-sap.jsonocel")
-log_management.select("example-sap.jsonocel")
+log_management.register("example_order_process.jsonocel", "data/uploads/example_order_process.jsonocel")
+log_management.select("example_order_process.jsonocel")
 
 app.layout = layout
 

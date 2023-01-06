@@ -14,7 +14,7 @@ class SingletonClass(object):
             cls.instance = super(SingletonClass, cls).__new__(cls)
             # Initialize the data attribute as an empty dictionary
             cls.instance.data = {}
-            cls.instance.selected = 'example-sap.jsonocel'
+            cls.instance.selected = 'example_order_process.jsonocel'
         # Return the existing instance of the class
         return cls.instance
 
