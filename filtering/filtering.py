@@ -13,6 +13,8 @@ from app import log_management
 
 from utils.constants import UPLOAD_DIRECTORY
 import dms.dms
+from utils.constants import analyse_page_location
+
 
 def get_new_path_name():
     log_paths = log_management.get_filter_steps()
@@ -259,6 +261,18 @@ def save_changes(button_clicks, upload_children, filename):
     return None, upload_children, new_filename
 
 @app.callback(
+    Output("url", "pathname"),
+    Input('go-to-analysis-button', 'n_clicks'),
+    State("url", "pathname")
+)
+def go_to_analysis(button_clicks, pathname):
+    if button_clicks is None or button_clicks == 0:
+        return pathname
+    else:
+        return analyse_page_location
+
+
+@app.callback(
     Output('event-attribute-dropdown', 'value'),
     Output('event-attribute-checkboxes', 'children'),
     Output('event-attribute-positive-radio', 'value'),
@@ -379,6 +393,11 @@ filtering_panel = [
         html.Button(
             'Save changes',
             id='save-changes-button',
+            n_clicks=0,
+        ),
+        html.Button(
+            'Go to analysis',
+            id='go-to-analysis-button',
             n_clicks=0,
         ),
         filtering_label,
