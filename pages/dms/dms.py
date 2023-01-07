@@ -214,7 +214,7 @@ def download_selected_files(n_clicks, selected_files):
 )
 def extract_from_sap(btn1):
     msg = ""
-    if 'btn-extract' == ctx.triggered_id:
+    if 'btn-extract' == ctx.triggered_id and btn1 is not None and btn1 > 0:
         msg = extract_ocel()
     return html.Div(msg)
 
