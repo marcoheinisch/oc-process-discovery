@@ -5,9 +5,9 @@ import os
 from datetime import datetime
 
 from utils import constants
-from utils.constants import VBTYP_DESCRIPTIONS, UPLOAD_DIRECTORY, OBJECTCLAS_DESCRIPTIONS
+from utils.constants import VBTYP_DESCRIPTIONS, UPLOAD_DIRECTORY, OBJECTCLAS_DESCRIPTIONS, REGEX_ALPHANUMERIC
 from utils.sap_con import SapConnector
-from environment.settings import SAP_CON_PARAMS
+from utils.sql_con import SqlLiteConnection
 from app import log_management
 
 
@@ -34,14 +34,13 @@ def get_obj_and_types(df, obj_col, type_col) -> pd.DataFrame:
 def add_object_ids_column(df, from_columns: list = ["VBELV", "VBELN"]) -> pd.DataFrame:
     """Function to add a "object_id" column."""
     _df = df.copy()
-    _df['object_ids'] = _df[from_columns].values.tolist()    
+    _df['object_ids'] = _df[from_columns].values.tolist()   
     return _df
 
 
 def add_event_timestamp_column(df, date_column="ERDAT", time_column="ERZET", replace_columns=True) -> pd.DataFrame:
     """Function to add a "event_timestamp" column from the SAP date and time fields."""
     _df = df.copy()
-    # todo: check if the date and time fields are in the dataframe
     _df["event_timestamp"] = _df[date_column].astype(str) + _df[time_column].astype(str)
     _df["event_timestamp"] = pd.to_datetime(_df["event_timestamp"], format="%Y%m%d%H%M%S")
     if replace_columns:
@@ -55,7 +54,6 @@ def add_event_activity_column(df, activity_column="VBTYP_N", activity_value_pref
                               replace_columns=True) -> pd.DataFrame:
     """Function to add a "event_activity" column."""
     _df = df.copy()
-    # _df[activity_column] = _df[activity_column].str.replace('[^a-zA-Z0-9]', '')  moved to columns_astype_str
     _df["event_activity"] = activity_value_prefix + _df[activity_column].apply(lambda x: VBTYP_DESCRIPTIONS[x] if x in VBTYP_DESCRIPTIONS else x).astype(str)
     if replace_columns:
         _df.drop([activity_column], axis=1, inplace=True)
@@ -65,6 +63,7 @@ def add_event_activity_column(df, activity_column="VBTYP_N", activity_value_pref
 def add_event_id_column(df, event_id_column="event_id") -> pd.DataFrame:
     """Function to add a "event_id" column."""
     _df = df.copy()
+    _df = _df.reset_index()
     _df[event_id_column] = _df.index.astype(str)
     return _df
 
@@ -86,7 +85,6 @@ def construct_ocel_dict(df_events: pd.DataFrame, df_objects: pd.DataFrame) -> di
     """
 
     log = {}
-    # att_names = sorted(list(set(att_types.keys())))
     object_types = df_objects["object_type"].unique()
     object_types = sorted(list(object_types))
 
@@ -108,7 +106,7 @@ def construct_ocel_dict(df_events: pd.DataFrame, df_objects: pd.DataFrame) -> di
             "ocel:omap": list(row["object_ids"]),
             "ocel:vmap": {}
         }
-        # log["ocel:events"][index]["ocel:omap"] =
+    
     for index, row in df_objects.iterrows():
         log["ocel:objects"][row["object_id"]] = {
             "ocel:type": row["object_type"],
@@ -117,25 +115,27 @@ def construct_ocel_dict(df_events: pd.DataFrame, df_objects: pd.DataFrame) -> di
     return log
 
 
-def extract_jsonocel_data(tables):
+def extract_jsonocel(tables) -> dict:
     """Return jsonocel data from SAP tables dataframes."""
 
     # 1.1 Get all events creating a new document in VBFA
     vbfa = tables["VBFA"]
     vbfa = vbfa[['ERDAT', 'ERZET', 'VBELN', 'VBELV', 'VBTYP_N', 'VBTYP_V', "POSNN", "POSNV"]]  # todo: remove/move to constants
-    vbfa = columns_astype_str(vbfa, columns=['VBELN', 'VBELV', 'VBTYP_N', 'VBTYP_V', "POSNN", "POSNV"], regex='[^a-zA-Z0-9]')
+    vbfa = columns_astype_str(vbfa, columns=['VBELN', 'VBELV', 'VBTYP_N', 'VBTYP_V', "POSNN", "POSNV"], regex=REGEX_ALPHANUMERIC)
 
     vbfa = add_event_timestamp_column(vbfa)
-    vbfa = add_object_ids_column(vbfa, from_columns=["VBELV", "VBELN"])
-    vbfa = add_event_activity_column(vbfa, activity_column="VBTYP_N", activity_value_prefix="Create ",
-                                     replace_columns=False)
-    events_vbfa = vbfa
-
-    # 1.2 Get all objects and their object type from the events in VBFa:
+    vbfa = vbfa.groupby(['event_timestamp', 'VBELV', 'VBELN']).first().reset_index()
+    
     objects_vbfa_n = get_obj_and_types(vbfa, obj_col="VBELN", type_col="VBTYP_N")
     objects_vbfa_v = get_obj_and_types(vbfa, obj_col="VBELV", type_col="VBTYP_V")
-    objects_vbfa = pd.concat([objects_vbfa_n, objects_vbfa_v])
+    objects_vbfa = pd.concat([objects_vbfa_n, objects_vbfa_v], ignore_index=True)
     objects_vbfa.drop_duplicates(inplace=True)
+    
+    df = vbfa.groupby(['event_timestamp', 'VBELN', 'VBTYP_N'])['VBELV'].apply(set).apply(list).reset_index()
+    df['object_ids'] = df['VBELV'] + df['VBELN'].apply(lambda x: [x])
+    df = add_event_activity_column(df, activity_column="VBTYP_N", activity_value_prefix="Create ",
+                                     replace_columns=False)
+    events_vbfa = df
 
     # 2 Get Initial Inquirys
     vbak = tables["VBAK"]
@@ -151,7 +151,8 @@ def extract_jsonocel_data(tables):
     # 3 Get Cleared-Invoice events. These lines costed me a weekned of work. Kinda sad;)
     bsad = tables["BSAD"]
     bsad.replace('', pd.NA).dropna(subset=["VBELN"])
-    bsad = columns_astype_str(bsad, columns=['VBELN', 'AUGDT'], regex='[^a-zA-Z0-9]')
+    bsad = columns_astype_str(bsad, columns=['VBELN', 'AUGDT'], regex=REGEX_ALPHANUMERIC)
+    bsad = bsad[bsad['VBELN'].apply(lambda ids: len(ids) == 10)]
     bsad['ERZET'] = "235959"
     bsad['VBTYP_N'] = "Cleared Invoice"
     bsad = add_event_timestamp_column(bsad, date_column="AUGDT", time_column="ERZET")
@@ -159,12 +160,11 @@ def extract_jsonocel_data(tables):
     bsad = add_event_activity_column(bsad, activity_column="VBTYP_N", activity_value_prefix="",
                                      replace_columns=False)
     events_bsad = bsad
-    objects_bsad = get_obj_and_types(events_bsad, obj_col="VBELN", type_col="VBTYP_N")
 
     # 4 Get all events changing a document loged in CDHDR and CDPOS
     #cdpos = tables["CDPOS"]
     cdhdr = tables["CDHDR"]
-    cdhdr = columns_astype_str(cdhdr, columns=['OBJECTCLAS', 'OBJECTID', 'UDATE', 'UTIME'], regex='[^a-zA-Z0-9]')
+    cdhdr = columns_astype_str(cdhdr, columns=['OBJECTCLAS', 'OBJECTID', 'UDATE', 'UTIME'], regex=REGEX_ALPHANUMERIC)
     cdhdr = cdhdr[cdhdr['OBJECTCLAS'].isin(["LIEFERUNG", "VERKBELEG"])]
     cdhdr['OBJECTCLAS'] = cdhdr['OBJECTCLAS'].apply(lambda x: OBJECTCLAS_DESCRIPTIONS[x] if x in OBJECTCLAS_DESCRIPTIONS else x)
     cdhdr = add_event_timestamp_column(cdhdr, date_column="UDATE", time_column="UTIME")
@@ -175,20 +175,22 @@ def extract_jsonocel_data(tables):
     objects_cdhdr = get_obj_and_types(events_cdhdr, obj_col="OBJECTID", type_col="OBJECTCLAS")
 
     # Generate jsonocel
-    events = pd.concat([events_vbfa, events_vbak, events_bsad, events_cdhdr])
+    events = pd.concat([events_vbfa, events_vbak, events_bsad, events_cdhdr], ignore_index=True)
     events = events.sort_values("event_timestamp")
     events = add_event_id_column(events)
+    events.reset_index(drop=True, inplace=True)
     events = columns_astype_str(events, list(events.columns.drop(["event_timestamp", "object_ids"])))
-    events = events[events["event_timestamp"] > pd.to_datetime("20220101123000", format="%Y%m%d%H%M%S")]
+    events = events[["event_id", "event_timestamp", "event_activity", "object_ids"]]
     events.type = "succint"
 
-    objects = pd.concat([objects_vbfa, objects_vbak, objects_bsad, objects_cdhdr])
+    objects = pd.concat([objects_vbfa, objects_vbak, objects_cdhdr], ignore_index=True)
+    objects.reset_index(drop=True, inplace=True)
 
     log_dict = construct_ocel_dict(events, objects)
     return log_dict
 
 
-def export_jsonocel(log: dict, file_path: str = "log.jsonocel"):
+def dump_jsonocel(log: dict, file_path: str = "log.jsonocel"):
     """Export jsonocel to .jsonocel file."""
 
     def json_serial(obj):
@@ -210,32 +212,48 @@ def get_tables_from_sap(sap_con) -> dict[str, pd.DataFrame]:
             fields, table, MaxRows=constants.ROWS_AT_A_TIME)
         df = pd.DataFrame(results, columns=headers)
         tables[table] = df
-    sap_con.close_instance()
     return tables
 
 
 def extract_ocel() -> str:
     """Method used by 'extract' button at dms page (gui).
     Returns: extraction status or error message."""
-    try:
-        from pyrfc import Connection, ABAPApplicationError, ABAPRuntimeError, LogonError, CommunicationError
-    except ImportError:
-        return "Application Error: PyRFC not installed"
-    try:
-        sap_con = SapConnector.getInstance(SAP_CON_PARAMS)
-    except CommunicationError:
-        return "Could not connect to server."
-    except LogonError:
-        return "Could not log in. Wrong credentials?"
-    except (ABAPApplicationError, ABAPRuntimeError):
-        return "An error occurred."
-    tables = get_tables_from_sap(sap_con)
-    log = extract_jsonocel_data(tables)
     
-    log_name = "extracted_at_{}.jsonocel".format(datetime.now().strftime("%y%m%d_%H%M%S"))
+    use_sqlite = log_management.use_sqlite
+    
+    if not use_sqlite:
+        try:
+            from pyrfc import Connection, ABAPApplicationError, ABAPRuntimeError, LogonError, CommunicationError
+            SAP_CON_PARAMS = log_management.sap_config
+            sap_con = SapConnector(SAP_CON_PARAMS)
+            tables = get_tables_from_sap(sap_con)
+            del sap_con
+        except ImportError:
+            return "Application Error: PyRFC not installed"
+        except CommunicationError:
+            return "Could not connect to server."
+        except LogonError:
+            return "Could not log in. Wrong credentials?"
+        except Exception as e:
+            return "An error occurred: {}".format(type(e).__name__)
+        #sql_con = SqlLiteConnection()
+        #sql_con.push_tables(tables)
+    else:
+        sql_con = SqlLiteConnection()
+        tables = sql_con.get_tables()
+        
+    log = extract_jsonocel(tables)
+    
+    if not use_sqlite:
+        log_name = "extracted_at_{}.jsonocel".format(datetime.now().strftime("%y%m%d_%H%M%S"))
+    else:
+        log_name = "sql_at_{}.jsonocel".format(datetime.now().strftime("%y%m%d_%H%M%S"))
+
     log_path = os.path.join(UPLOAD_DIRECTORY, log_name)
-    export_jsonocel(log, file_path=log_path)
+    
+    dump_jsonocel(log, file_path=log_path)
     log_management.register(log_name, log_path)
+    
     return "Extraction successful."
 
 

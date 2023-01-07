@@ -20,6 +20,22 @@ class SingletonClass(object):
         return cls.instance
 
 class DataManagementSystem:
+    """Singleton class to manage data storage and retrieval"""
+    # A changeable variable of the Singelton storing a configuration dict
+    sap_config = {
+        'user': '',
+        'passwd': '',
+        'ashost': '',
+        'saprouter': '',
+        'msserv': '',
+        'sysid': '',
+        'group': '',
+        'client': '',
+        'lang': '',
+        'trace': ''
+    }
+    use_sqlite = False
+    
     @classmethod
     def __add_version_control(cls, key):
         # Get the single instance of the SingletonClass object

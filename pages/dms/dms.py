@@ -1,17 +1,16 @@
-from datetime import date
-
 import dash
+import os
+import pm4py
+import dash_bootstrap_components as dbc
 from dash import Dash, dcc, html, ctx
 from dash_extensions.enrich import Output, Input, State
 
+import dms
 from app import log_management
 from app import app
+from utils.constants import UPLOAD_DIRECTORY
 from extraction.extraction import extract_ocel
 from filtering.filtering import filtering_panel
-import os
-import dms
-from utils.constants import UPLOAD_DIRECTORY
-import pm4py
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -19,8 +18,6 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 #end_time_str = dcc.Input(id="end-time", type="text", placeholder="End time (hh:mm:ss)")
 
 
-
- 
 # Layout for the file upload component
 layout = html.Div([
     # Header
@@ -32,7 +29,8 @@ layout = html.Div([
         html.H6("Upload or extract log"),
         dcc.Loading(id='loading-extract', children=[
             html.Div([
-                html.Button('Extract from SAP', id='btn-extract', n_clicks=0, style={'width': '100%'}),
+                html.Button('Extract from SAP', id='btn-extract', n_clicks=0, style={'width': '70%'}),
+                html.Button("Config", id="con_config_button", n_clicks=0, style={'width': '30%'}),
                 html.Div(id='container-feedback-text')
             ], style={'width': '100%', 'display': 'inline-block', 'padding': '10px'}),
         ], type='default'),
@@ -77,12 +75,40 @@ layout = html.Div([
         html.Div([
             html.H6("Filter Data"),
         ] + filtering_panel ),
+
+        # Modal for SAP connection configuration
+        html.Div([
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle("SAP connection configuration")),
+                dbc.ModalBody([
+                    html.P("Select a parameter to be modified and enter its new value below."),
+                    dcc.Dropdown(['user', 'passwd', 'ashost', 'saprouter', 'msserv', 'sysid', 'group', 'client', 'lang', 'trace'], 'user', id='param-dropdown'),
+                    html.Div(id='dd-output-container'),
+                    html.Div([
+                        dbc.Input(id="input", placeholder="Enter new value.", type="text"),
+                        html.P(id="output"),
+                    ]),
+                    html.Button(
+                        "Save", id="save", n_clicks=0
+                    ),
+                    html.Div(id='save-output'),
+                    html.Br(),
+                    dcc.Checklist(id="options_checklist", options=['Use SQLite3 database instead SAP']),
+                    html.Div(id='options_checklist_output', style={"display":"none"}),
+                ]),
+                dbc.ModalFooter(
+                    dbc.Button(
+                        "Close", id="close", className="ms-auto", n_clicks=0
+                    )
+                ),
+            ],
+            id="con_config_modal",
+            is_open=False,),
+        ])
     # Global dms div
     ], style={'width': '40%', 'display': 'inline-block', 'padding': '10px'}),
+
 ])
-
-
-    
 
 
 # Callback function to store the contents of the uploaded file
@@ -105,12 +131,52 @@ def parse_contents(contents, filename, date, selected): #date is not used yet
         'File {} successfully uploaded'.format(filename)
     ]), selected
 
+
 # Callback function to mark a file for the analysis
 @app.callback(Output('uploaded-files-checklist', 'children'), 
               [Input('uploaded-files-checklist', 'value')])
 def select_checklist_options(value):
     log_management.select(value)
-    return 'You have selected "{}" for analysis'.format(value)
+    return '  You have selected "{}" for analysis'.format(value)
+
+
+# Callback function to open the modal
+@app.callback(
+    Output("con_config_modal", "is_open"),
+    [Input("con_config_button", "n_clicks"), Input("close", "n_clicks")],
+    [State("con_config_modal", "is_open")],
+)
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+# Callback to display selected parameter in options_checklist
+@app.callback(
+    Output('options_checklist_output', 'children'),
+    Output('btn-extract', "children"),
+    Input('options_checklist', 'value'),
+)
+def update_config(value):
+    selected = value and (len(value) > 0)
+    log_management.use_sqlite = selected
+    button_value = "Extract from SAP" if not selected else "Extract from SQLite"
+    return value, button_value
+
+# Callback to save input given in modal
+@app.callback(
+    Output('save-output', 'children'),
+    Input('save', 'n_clicks'),
+    State('param-dropdown', 'value'),
+    State("input", "value")
+)
+def change_sap_config(save_btn, selected_param, new_value):
+    msg = "Not saved."
+    if "save" == ctx.triggered_id:
+        log_management.sap_config[selected_param] = new_value
+        msg = f"New value for {selected_param} saved successfully."
+    return html.Div(msg)
+
 
 #list of uploaded files
 @app.callback(Output('uploaded-files-checklist', 'options'),

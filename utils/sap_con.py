@@ -2,43 +2,30 @@ try:
     from pyrfc import Connection, ABAPApplicationError, ABAPRuntimeError, LogonError, CommunicationError
 except ImportError:
     print("You do not have pyrfc installed! You can not use the SAP Connector functionality!")
-from environment.settings import SAP_CON_PARAMS
 
 class SapConnector:
-    """Singleton SAP connector to connect to the SAP system with PYRFC"""
-    __instance = None
-
-    def getInstance(conn_params):
-        """A function to return singleton SAP connection"""
-        if not (SapConnector.__instance != None):
-            SapConnector(conn_params)
-        return SapConnector.__instance
-
+    conn = None
+    
     def __init__(self, conn_params):
-        """ Virtually private constructor. """
-        if SapConnector.__instance != None:
-            raise Exception("This class is a singleton!")
-        else:
-            print("Initialize SAP Connector")
-            SapConnector.__instance = self
-            try:
-                self.conn = Connection(**conn_params)
-                print("SAP connection successful")
+        print("Initialize SAP Connector")
+        try:
+            self.conn = Connection(**conn_params)
+            print("SAP connection successful")
 
-            # Handle errors
-            except (CommunicationError, LogonError, ABAPApplicationError, ABAPRuntimeError) as error:
-                print(error)
-                self.conn = None
-                raise
+        # Handle errors
+        except (CommunicationError, LogonError, ABAPApplicationError, ABAPRuntimeError) as error:
+            print(error)
+            raise
+        
+    def __del__(self):
+        if self.conn != None:
+            self.conn.close()
+        print("SAP Connector deleted")
 
     def close_instance(self):
         """A function the destroy the singleton SAP connection"""
-        if SapConnector.__instance != None:
-            print("Closing SAP connection")
-            self.conn.close()
-            self.conn = None
-            print("SAP connection closed")
-            self = None
+        self.conn.close()
+        print("SAP connection closed")
 
     def qry(self, Fields, SQLTable, Where='', MaxRows=50, FromRow=0):
         """A function to query SAP with RFC_READ_TABLE"""
@@ -94,21 +81,3 @@ class SapConnector:
         """ Function to get the connection details of a session with the SAP system """
         return self.conn.call("STFC_CONNECTION")['RESPTEXT']
 
-    def check_conn(user, password):
-        conn_params = SAP_CON_PARAMS
-        conn_params['user'] = user
-        conn_params['passwd'] = password
-        try:
-            conn = Connection(**conn_params)
-            print("SAP connection successful")
-            return None
-            # Handle errors
-        except CommunicationError:
-            print("Could not connect to server.")
-            return "Could not connect to server. Try activating your IP: https://remotelogin.sapucc.in.tum.de/"
-        except LogonError:
-            print("Could not log in. Wrong credentials?")
-            return "Could not log in. Wrong credentials?"
-        except (ABAPApplicationError, ABAPRuntimeError):
-            print("An error occurred.")
-            return "An error occurred."

@@ -3,9 +3,12 @@ import os.path
 import dash
 import dash_bootstrap_components as dbc
 import diskcache
+import os
+
 from flask_caching import Cache
 from dash import DiskcacheManager
 
+from environment.settings import SAP_CON_PARAMS
 from dms.dms import DataManagementSystem
 from utils.external_assets import FONT_AWSOME, CUSTOM_STYLE
 from layout.layout import layout
@@ -45,6 +48,7 @@ cache = Cache(app.server, config={
 })
 
 log_management = DataManagementSystem()
+log_management.sap_config = SAP_CON_PARAMS
 log_management.clear()
 
 app.layout = layout
