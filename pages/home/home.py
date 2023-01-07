@@ -1,7 +1,7 @@
 import datetime
 
 from dash import Dash, dcc, html
-from dash.dependencies import Input, Output, State
+from dash_extensions.enrich import Output, Input, State
 from dms.dms import DataManagementSystem
 from app import app
 

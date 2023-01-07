@@ -1,12 +1,16 @@
-from datetime import date
+import dash
 import os
-from dash import Dash, dcc, html, ctx
-from dash.dependencies import Input, Output, State
+import pm4py
 import dash_bootstrap_components as dbc
+from dash import Dash, dcc, html, ctx
+from dash_extensions.enrich import Output, Input, State
 
+import dms
 from app import log_management
 from app import app
+from utils.constants import UPLOAD_DIRECTORY
 from extraction.extraction import extract_ocel
+from filtering.filtering import filtering_panel
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -62,12 +66,16 @@ layout = html.Div([
             #html.Div(html.B("Your files")),
             dcc.RadioItems(id='uploaded-files-checklist', options=[], style={'width': '100%'}),
             # Delete button
-            html.Button(id='delete-file-button', children='Delete', style={'width': '50%'}),
+            html.Button(id='delete-file-button', children='Delete', style={'width': '50%'}, n_clicks=0),
             # Download button
             html.Button("Download", id="download-button", n_clicks=0, style={'width': '50%'}),
-            dcc.Download(id="download-file"),
-        ], style={'width': '100%', 'display': 'inline-block', 'vertical-align': 'top', 'padding': '10px'}),
-    
+            dcc.Download(id="download-file", base64=True),
+        ], style={'width': '100%', 'display': 'inline-block', 'vertical-align': 'top'}),
+        
+        html.Div([
+            html.H6("Filter Data"),
+        ] + filtering_panel ),
+
         # Modal for SAP connection configuration
         html.Div([
             dbc.Modal([
@@ -97,7 +105,6 @@ layout = html.Div([
             id="con_config_modal",
             is_open=False,),
         ])
-    
     # Global dms div
     ], style={'width': '40%', 'display': 'inline-block', 'padding': '10px'}),
 
@@ -106,18 +113,23 @@ layout = html.Div([
 
 # Callback function to store the contents of the uploaded file
 @app.callback(Output('output-jsonocel-upload', 'children'),
+              Output('uploaded-files-checklist', 'value'),
               [Input('upload-jsonocel', 'contents')],
               [State('upload-jsonocel', 'filename'),
-               State('upload-jsonocel', 'last_modified')])
+               State('upload-jsonocel', 'last_modified'),
+               State('uploaded-files-checklist', 'value')])
 #store the contents of an uploaded file(s) and display a message indicating the file(s) was successfully uploaded
-def parse_contents(contents, filename, date): #date is not used yet
+def parse_contents(contents, filename, date, selected): #date is not used yet
     if contents is None:
-        return "No files uploaded"
+        return "No files uploaded", selected
     for i in range(len(contents)):
+        filename[i] = log_management.get_a_unique_filename(filename[i])
         log_management.store(filename[i], contents[i])
+    if len(contents) == 1:
+        selected = filename[0]
     return html.Div([
         'File {} successfully uploaded'.format(filename)
-    ])
+    ]), selected
 
 
 # Callback function to mark a file for the analysis
@@ -172,7 +184,7 @@ def change_sap_config(save_btn, selected_param, new_value):
               [Input('output-jsonocel-upload', 'children')],
               [State('uploaded-files-checklist', 'options')])
 def update_checklist_options(v, children, existing_options):
-    options = log_management.all_keys()
+    options = log_management.all_upload_keys()
     if options is None:
         options = []
     updated_options =  [{'label': str(filename), 'value': str(filename)} for filename in options]
@@ -202,9 +214,24 @@ def download_selected_files(n_clicks, selected_files):
 )
 def extract_from_sap(btn1):
     msg = ""
-    if 'btn-extract' == ctx.triggered_id:
+    if 'btn-extract' == ctx.triggered_id and btn1 is not None and btn1 > 0:
         msg = extract_ocel()
     return html.Div(msg)
 
 if __name__ == '__main__': #only run if this file is called directly
     app.run_server(debug=True) #enables debug mode
+
+@app.callback(
+    Output("download-file", 'data'),
+    Input("download-button", 'n_clicks'),
+    State('uploaded-files-checklist', 'value'),
+)
+def download(button_clicks, filename):
+    if button_clicks is None or button_clicks == 0:
+        return dash.no_update
+    ocel = log_management.get_ocel()
+    singleton_instance = dms.dms.SingletonClass()
+    key = singleton_instance.selected
+    filename = os.path.join(UPLOAD_DIRECTORY, key.rpartition('.jsonocel')[0] + '_downloaded.jsonocel')
+    pm4py.write_ocel(ocel, filename)
+    return dcc.send_file(filename)

@@ -55,11 +55,10 @@ options = dbc.Card(
                     options=[
                         {"label": row[0], "value": row[1]} for row in apdas
                     ],
-                    value="AM",
+                    value="pm4py",
                     clearable=False,
                     optionHeight=80,
                     searchable=True,
-
                 ),
             ],
         ),
@@ -89,6 +88,26 @@ sidebar = html.Div(
             options,
             id="pm-collapse",
         ),
+        html.Div(
+            [
+                html.Hr(
+                    style={
+                        "border-top": "solid white"
+                    },
+                    id="pm-hr"
+                ),
+                html.Button(
+                    'Go back to dms',
+                    style={
+                        "background-color": "white",
+                    },
+                    id='go-to-dms-button',
+                    n_clicks=0,
+                ),
+            ],
+            id="pm-go-back-to-dms",
+        ),
+
     ],
     id="pm-sidebar",
 )
