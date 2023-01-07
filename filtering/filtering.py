@@ -444,6 +444,7 @@ filtering_panel = [
         html.Button(
             'Go to analysis',
             id='go-to-analysis-button',
+            style={'color': 'white', 'background-color': '#0d6efd'},
             n_clicks=0,
         ),
         html.Button(
