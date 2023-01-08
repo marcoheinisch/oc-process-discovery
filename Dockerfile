@@ -4,12 +4,14 @@ WORKDIR /code
 
 COPY requirements.txt /
 
-RUN pip install -r /requirements.txt \
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends graphviz
+RUN pip install -r /requirements.txt --use-deprecated=legacy-resolver \
 	&& rm -rf /root/.cache
 
 COPY ./ ./
 
-ENV ENVIRONMENT_FILE=".env.development"
+ENV ENVIRONMENT_FILE=".env"
 
 EXPOSE 8085
 
