@@ -1,7 +1,9 @@
 # oc-process-discovery
 A process discovery tool working on object-centric event logs extracted from SAP ERP. It was developed in the "Process Discovery Using Python" lab at RWTH. 
 
-# Manual setup: Python venv
+
+# Setup (Marco)
+## Manual setup: Python venv
 This project uses Python 3.9.13
 
 1. Create virtual environment. For example with `python -m venv venv`
@@ -12,10 +14,21 @@ This project uses Python 3.9.13
    1. in vs code: use the configuration stored in launch.json file
    2. in pycharm: use the configuration stored in .idea/runConfigurations/oc_process_discovery.xml file
 
-# Docker setup
+## Docker setup
 Note: Because SAPnwRFC is Plattform depencent and can't be shared in this repository due to lizensing, Extraction directly from SAP systems is yet not possible in Docker.
 1. Check if pyrfc is commented out in requiremnts.txt
 2. execute `docker build -t ocpaapp .`
 3. run image
+
+## Usage
+### Extraction from SAP (Marco)
+### Dataset management (upload, download, delete) (Pedro)
+### Filtering datasets (Kacper)
+### Analysis
+
+## Troubleshooting
+
+## Further information
+Links to the documentation of the used libraries and frameworks.
 
 

@@ -7,6 +7,12 @@ from app import app
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-layout = html.Div(html.P("This is the content of the Home page!"))
+# https://dash.plotly.com/dash-core-components/markdown
+
+
+# load markdown file and display it in the app
+markdown_content = open('README.md', 'r').read()
+layout = html.Div(dcc.Markdown(markdown_content))
+
 
 app = Dash(__name__, external_stylesheets=external_stylesheets)
