@@ -2,7 +2,7 @@
 A process discovery tool working on object-centric event logs extracted from SAP ERP. It was developed in the "Process Discovery Using Python" lab at RWTH. 
 
 
-# Setup (Marco)
+# Setup
 ## Manual setup: Python venv
 This project uses Python 3.9.13
 
@@ -21,6 +21,7 @@ Note: Because SAPnwRFC is Plattform depencent and can't be shared in this reposi
 3. run image
 
 ## Usage
+### Overview (Jean)
 ### Extraction from SAP (Marco)
 ### Dataset management (upload, download, delete) (Pedro)
 
@@ -34,7 +35,7 @@ If, instead of uploading logs from the SAP, you want to upload them from your ow
 All your extracted and/or uploaded files should be visible in the section "View and select file for analysis". There, you will have not only the possibility of selecting specific files to be deleted, but also to be downloaded. All files will then be ready to be filtered, as we will see now thoroughly in the next section.
 
 ### Filtering datasets (Kacper)
-### Analysis
+### Analysis (Jean)
 
 ## Troubleshooting
 
