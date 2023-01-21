@@ -11,18 +11,34 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 # https://dash.plotly.com/dash-core-components/markdown
 
+def get_redme_markdown():
+    markdown_content = open('README.md', 'r').read()
+    from_chapter= "# Setup"
+    to_chapter = "# Usage"
+    
+    match = re.search(
+        f"({from_chapter}.*?)({to_chapter})", 
+        markdown_content, 
+        re.DOTALL)
+    if match:
+        text = match.group(1)
+        markdown_content = markdown_content.replace(text,"") + "\n" + text
+    return markdown_content
 
-# load markdown file and display it in the app
-markdown_content = open('README.md', 'r').read()
+markdown_content = get_redme_markdown()
 
-chapter_title= "Setup"
-pattern = f"(^# {chapter_title}\n.+)(.*\n)*"
-match = re.search(pattern, markdown_content, re.MULTILINE)
-if match:
-    pass
-    #markdown_content = markdown_content.replace(match.group(1),"")
+layout = html.Div([
+    html.H1("Documentation"),
+    html.Hr(),
+    dcc.Markdown(
+        markdown_content, 
+        dedent = False,
+        dangerously_allow_html = True,
+        id = 'markdown-content',
+        style = {'max-width': '600px'}
+    )])
 
-layout = html.Div(dcc.Markdown(markdown_content, dangerously_allow_html = True))
+
+#app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 
-app = Dash(__name__, external_stylesheets=external_stylesheets)
