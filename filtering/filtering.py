@@ -447,11 +447,6 @@ filtering_panel = [
             style={'color': 'white', 'background-color': '#0d6efd'},
             n_clicks=0,
         ),
-        html.Button(
-            'Clear all',
-            id='clear-button',
-            n_clicks=0,
-        ),
         filtering_label,
         save_changes_label,
         clear_label,

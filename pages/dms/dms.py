@@ -58,6 +58,20 @@ layout = html.Div([
 
             ),
             html.Div(id='output-jsonocel-upload', style={'width': '100%'}),
+            html.Button(
+                'Clear all',
+                id='clear-button',
+                n_clicks=0,
+                style={
+                    'width': '100%',
+                    'height': '40px',
+                    'lineHeight': '40px',
+                    'borderWidth': '1px',
+                    'borderStyle': 'dashed',
+                    'borderRadius': '5px',
+                    'textAlign': 'center',
+                },
+            ),
         ], style={'width': '100%', 'padding': '10px'}),
         
         # Data management component
