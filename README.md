@@ -35,6 +35,19 @@ If, instead of uploading logs from the SAP, you want to upload them from your ow
 All your extracted and/or uploaded files should be visible in the section "View and select file for analysis". There, you will have not only the possibility of selecting specific files to be deleted, but also to be downloaded. All files will then be ready to be filtered, as we will see now thoroughly in the next section.
 
 ### Filtering datasets (Kacper)
+On the same [data management page](dms) you can find a Filtering segment that presents you with an opportunity to refine your data based on the preliminary analysis results. That way, you can observe how your process models change in relation to minor modifications in the underlying data and draw conclusions accordingly. Our UI offers some tools and options that will make your work more productive and comprehensive:
+#### Filter on Event Attributes
+1. Choose the event attribute that you want to filter by, say "ocel:activity"
+2. Pick a list of values for that attribute from the dropdown that appeared after that.
+3. Positive/Negative - here you have to decide whether you want to leave the values chosen in the data (Positive) or their complement (Negative)
+
+This is how that would could be implemented in the backend:
+```
+filtered_ocel = pm4py.filter_ocel_event_attribute(ocel, "ocel:activity", ["Item out of stock", "Fuel Car", "Reorder Item"], positive=False)
+```
+... and here's how you can do that using the UI:
+![After](docs/images/filtering/event/after.png)
+
 ### Analysis (Jean)
 
 ## Troubleshooting
