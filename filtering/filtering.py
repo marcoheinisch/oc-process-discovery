@@ -67,7 +67,7 @@ event_attribute_checkboxes = html.Div(
 event_attribute_positive_radio = dcc.RadioItems(
     id='event-attribute-positive-radio',
     options=[{'label': 'positive', 'value': True}, {'label': 'negative', 'value': False}],
-    value=True,  # default value
+    value=False,  # default value
     labelStyle={'display': 'inline-block'}
 )
 
@@ -96,7 +96,7 @@ object_attribute_checkboxes = html.Div(
 object_attribute_positive_radio = dcc.RadioItems(
     id='object-attribute-positive-radio',
     options=[{'label': 'positive', 'value': True}, {'label': 'negative', 'value': False}],
-    value=True,  # default value
+    value=False,  # default value
     labelStyle={'display': 'inline-block'}
 )
 

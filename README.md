@@ -51,7 +51,7 @@ On the same [data management page](dms) you can find a Filtering segment that pr
 #### Filter on Event Attributes
 1. Choose the event attribute that you want to filter by, say, "ocel:activity"
 2. Pick a list of values for that attribute from the dropdown that appeared after that.
-3. Positive/Negative - here you have to decide whether you want to leave the values chosen in the data (Positive) or their complement (Negative)
+3. Positive/Negative - here you have to decide whether you want to leave the values chosen in the data (Positive) or their complement (Negative). Negative is chosen as default.
 
 This is how that would be implemented in the backend:
 ```
@@ -64,7 +64,7 @@ filtered_ocel = pm4py.filter_ocel_event_attribute(ocel, "ocel:activity", ["Item 
 Similarly to Filter on Event Attributes, for the next type of filtering you need to:
 
 1. Choose the object type that you want to filter by, e.g. "order"
-2. Set the Positive/Negative flag
+2. Set the Positive/Negative flag (Negative as default)
 ![Object filtering](assets/images/filtering/object/object_filtering.gif)
 
 #### Buttons
