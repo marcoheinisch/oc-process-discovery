@@ -15,6 +15,8 @@ from utils.constants import UPLOAD_DIRECTORY
 import dms.dms
 from utils.constants import analyse_page_location, dms_page_location
 
+import pandas as pd
+
 
 # panel components
 save_changes_label = html.Label(
@@ -99,6 +101,17 @@ object_attribute_positive_radio = dcc.RadioItems(
     value=False,  # default value
     labelStyle={'display': 'inline-block'}
 )
+
+dcc.DatePickerSingle(
+    id='start-date',
+    date=str(pd.to_datetime('today').date())
+),
+dcc.DatePickerSingle(
+    id='end-date',
+    date=str(pd.to_datetime('today').date()),
+    min_date_allowed=str(pd.to_datetime('today').date()),
+    max_date_allowed=str(pd.to_datetime('today').date()),
+),
 
 
 # callbacks
@@ -345,7 +358,7 @@ def filter_on_event_attributes(button_clicks, filename, keys, children, positive
         selected_values[key] = value
 
     if not keys:
-        return [], [], True, 'hidden', button_clicks
+        return [], [], False, 'hidden', button_clicks
 
     # apply filtering per key
     for key in keys:
@@ -354,7 +367,7 @@ def filter_on_event_attributes(button_clicks, filename, keys, children, positive
         ocel = pm4py.filter_ocel_event_attribute(ocel, key, selected_values[key], positive)
 
     log_management.store_version_control(filename, ocel)
-    return [], [], True, None, button_clicks
+    return [], [], False, None, button_clicks
 
 
 @app.callback(
@@ -384,7 +397,7 @@ def filter_on_object_attributes(button_clicks, filename, keys, children, positiv
         selected_values[key] = value
 
     if not keys:
-        return [], [], True, 'hidden', button_clicks
+        return [], [], False, 'hidden', button_clicks
 
     # apply filtering per key
     for key in keys:
@@ -393,7 +406,7 @@ def filter_on_object_attributes(button_clicks, filename, keys, children, positiv
         ocel = pm4py.filter_ocel_object_attribute(ocel, key, selected_values[key], positive)
 
     log_management.store_version_control(filename, ocel)
-    return [], [], True, None, button_clicks
+    return [], [], False, None, button_clicks
 
 
 # create layout

@@ -283,7 +283,7 @@ def download(button_clicks, filename):
     Input('uploaded-files-checklist', 'children'),
     Input('filter-trigger-3', 'n-clicks'),)
 def set_statistics(value1, value2):
-    ocel = copy.deepcopy(log_management.load_version_control(dms.dms.SingletonClass().selected))
+    ocel = log_management.get_ocel()
     df = ocel.get_extended_table()
     # df.rename(columns=lambda x: re.sub(r'\W+', '_', x), inplace=True)
     df.replace({np.nan: 'N/A'}, inplace=True)
