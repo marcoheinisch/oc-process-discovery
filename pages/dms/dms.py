@@ -4,6 +4,7 @@ import pm4py
 import dash_bootstrap_components as dbc
 from dash import Dash, dcc, html, ctx
 from dash_extensions.enrich import Output, Input, State
+from datetime import date
 
 import dms
 from app import log_management
@@ -31,7 +32,7 @@ layout = html.Div([
             html.Div([
                 html.Button('Extract from SAP', id='btn-extract', n_clicks=0, style={'width': '70%'}),
                 html.Button("Config", id="con_config_button", n_clicks=0, style={'width': '30%'}),
-                html.Div(id='container-feedback-text')
+                html.Div(id='container-feedback-text', style={'color': 'gray'})
             ], style={'width': '100%', 'display': 'inline-block', 'padding': '10px'}),
         ], type='default'),
         
@@ -57,7 +58,7 @@ layout = html.Div([
                 accept=".jsonocel"
 
             ),
-            html.Div(id='output-jsonocel-upload', style={'width': '100%'}),
+            html.Div(id='output-jsonocel-upload', style={'width': '100%','color': 'gray'}),
         ], style={'width': '100%', 'padding': '10px'}),
         
         # Data management component
@@ -81,20 +82,34 @@ layout = html.Div([
             dbc.Modal([
                 dbc.ModalHeader(dbc.ModalTitle("SAP connection configuration")),
                 dbc.ModalBody([
-                    html.P("Select a parameter to be modified and enter its new value below."),
+                    html.P("1. Select a parameter to be modified and enter its new value below."),
                     dcc.Dropdown(['user', 'passwd', 'ashost', 'saprouter', 'msserv', 'sysid', 'group', 'client', 'lang', 'trace'], 'user', id='param-dropdown'),
-                    html.Div(id='dd-output-container'),
+                    html.Div(id='dd-output-container', style={'color': 'gray'}),
                     html.Div([
                         dbc.Input(id="input", placeholder="Enter new value.", type="text"),
-                        html.P(id="output"),
+                        html.P(id="output", style={'color': 'gray'}),
                     ]),
                     html.Button(
                         "Save", id="save", n_clicks=0
                     ),
-                    html.Div(id='save-output'),
-                    html.Br(),
+                    html.Div(id='save-output', style={'color': 'gray'}),
+                    html.Hr(style={"margin-top":"0.5rem", "margin-bottom":"0.5rem"}),
+                    html.P("2. Select the daterange of the data to be extracted:"),
+                    html.Div([
+                        dcc.DatePickerRange(
+                            id='my-date-picker-range',
+                            min_date_allowed=date(1995, 8, 5),
+                            max_date_allowed=date.today(),
+                            start_date=log_management.extraction_config['from_date'],
+                            end_date=log_management.extraction_config['to_date'],
+                            persistence=False,
+                            #display_format='DD.MM.YYYY'
+                        ),
+                        html.Div(id='output-container-date-picker-range', style={'color': 'gray'})
+                    ]),
+                    html.Hr(style={"margin-top":"0.5rem", "margin-bottom":"0.5rem"}),
                     dcc.Checklist(id="options_checklist", options=['Use SQLite3 database instead SAP']),
-                    html.Div(id='options_checklist_output', style={"display":"none"}),
+                    html.Div(id='options_checklist_output', style={"display":"none",'color': 'gray'}),
                 ]),
                 dbc.ModalFooter(
                     dbc.Button(
@@ -109,6 +124,29 @@ layout = html.Div([
     ], style={'width': '40%', 'display': 'inline-block', 'padding': '10px'}),
 
 ])
+
+
+
+@app.callback(
+    Output('output-container-date-picker-range', 'children'),
+    Input('my-date-picker-range', 'start_date'),
+    Input('my-date-picker-range', 'end_date'))
+def update_output(start_date, end_date):
+    string_prefix = 'You have selected: '
+    if start_date is not None:
+        start_date_object = date.fromisoformat(start_date)
+        log_management.extraction_config['from_date'] = start_date_object
+        start_date_string = start_date_object.strftime('%B %d, %Y')
+        string_prefix = string_prefix + 'Start Date: ' + start_date_string + ' | '
+    if end_date is not None:
+        end_date_object = date.fromisoformat(end_date)
+        log_management.extraction_config['to_date'] = end_date_object
+        end_date_string = end_date_object.strftime('%B %d, %Y')
+        string_prefix = string_prefix + 'End Date: ' + end_date_string
+    if len(string_prefix) == len('You have selected: '):
+        return 'Select a date to see it displayed here'
+    else:
+        return string_prefix
 
 
 # Callback function to store the contents of the uploaded file

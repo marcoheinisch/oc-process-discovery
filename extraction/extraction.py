@@ -45,8 +45,12 @@ def add_event_timestamp_column(df, date_column="ERDAT", time_column="ERZET", rep
     _df["event_timestamp"] = pd.to_datetime(_df["event_timestamp"], format="%Y%m%d%H%M%S")
     if replace_columns:
         _df.drop([date_column, time_column], axis=1, inplace=True)
+        
+    start = datetime.combine(log_management.extraction_config['from_date'], datetime.min.time())
+    end = datetime.combine(log_management.extraction_config['to_date'], datetime.max.time())
     
-    _df = _df[_df["event_timestamp"] > pd.to_datetime("20220101123000", format="%Y%m%d%H%M%S")]
+    _df = _df[_df["event_timestamp"] > start]
+    _df = _df[_df["event_timestamp"] < end]
     return _df
 
 
@@ -182,6 +186,9 @@ def extract_jsonocel(tables) -> dict:
     events = columns_astype_str(events, list(events.columns.drop(["event_timestamp", "object_ids"])))
     events = events[["event_id", "event_timestamp", "event_activity", "object_ids"]]
     events.type = "succint"
+    
+    if len(events) == 0:
+        raise Exception("No events to process.")
 
     objects = pd.concat([objects_vbfa, objects_vbak, objects_cdhdr], ignore_index=True)
     objects.reset_index(drop=True, inplace=True)
@@ -235,14 +242,18 @@ def extract_ocel() -> str:
         except LogonError:
             return "Could not log in. Wrong credentials?"
         except Exception as e:
-            return "An error occurred: {}".format(type(e).__name__)
+            return "An error occurred: {}".format(str(e))
         #sql_con = SqlLiteConnection()
         #sql_con.push_tables(tables)
     else:
         sql_con = SqlLiteConnection()
         tables = sql_con.get_tables()
-        
-    log = extract_jsonocel(tables)
+    
+    try:
+        log = extract_jsonocel(tables)
+    except Exception as e:
+        # return exception message
+        return str(e)
     
     if not use_sqlite:
         log_name = "extracted_at_{}.jsonocel".format(datetime.now().strftime("%y%m%d_%H%M%S"))
