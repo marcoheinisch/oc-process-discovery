@@ -285,7 +285,7 @@ def download(button_clicks, filename):
 def set_statistics(value1, value2):
     ocel = copy.deepcopy(log_management.load_version_control(dms.dms.SingletonClass().selected))
     df = ocel.get_extended_table()
-    df.rename(columns=lambda x: re.sub(r'\W+', '_', x), inplace=True)
+    # df.rename(columns=lambda x: re.sub(r'\W+', '_', x), inplace=True)
     df.replace({np.nan: 'N/A'}, inplace=True)
     def flatten_lists(val):
         if isinstance(val, list):
