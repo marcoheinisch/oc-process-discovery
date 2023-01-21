@@ -1,11 +1,8 @@
-# oc-process-discovery
+# OC-Process-Discovery
 A process discovery tool working on object-centric event logs extracted from SAP ERP. It was developed in the "Process Discovery Using Python" lab at RWTH. 
-
-
 # Setup
 ## Manual setup: Python venv
-This project uses Python 3.9.13
-
+This project runs on Python 3.9.13
 1. Create virtual environment. For example with `python -m venv venv`
 2. Activate virtual environment. For example with `source venv/bin/activate` or `venv\Scripts\activate.ps1` 
 3. Install dependencies with `pip install -r requirements.txt --use-deprecated=legacy-resolver `
@@ -13,16 +10,31 @@ This project uses Python 3.9.13
 5. Run project / index.py
    1. in vs code: use the configuration stored in launch.json file
    2. in pycharm: use the configuration stored in .idea/runConfigurations/oc_process_discovery.xml file
-
 ## Docker setup
 Note: Because SAPnwRFC is Plattform depencent and can't be shared in this repository due to lizensing, Extraction directly from SAP systems is yet not possible in Docker.
 1. Check if pyrfc is commented out in requiremnts.txt
-2. execute `docker build -t ocpaapp .`
-3. run image
+2. Build docker image: `docker build -t ocpaapp .`
+3. Run image: `docker run --name ocpa -p 8084:8085 ocpaapp   `
+# Usage
+## Overview (Jean)
+## Extraction from SAP (Marco)
+You can use this tool to extract a OCEL containing O2C related events from SAP 4/hana or alternative from a sqlite database cotaining needed SAP tables. 
+### Extraction from SAP Cloud
+To use this feature you have to set the connection parameters and credentials for you SAP instancence:
+1. In data-view click on Configuration (2) 
 
-## Usage
-### Overview (Jean)
-### Extraction from SAP (Marco)
+<img src="assets/images/extraction_1.PNG" alt="Welcome screen of eXdpn UI" style=""/>
+
+2. In the popup: Select the parameter you want to change in the dropdown (3) type the new value (4) and click save (5).   
+
+<img src="assets/images/extraction_config.PNG" alt="Welcome screen of eXdpn UI" style=""/>
+
+3. Make sure your device is allowed to connect with SAP. After everything is set, close the Popup und start Extraction (5). 
+
+#### Extraction from SQLite
+You don't have to set SAP credentials. Instead go to Configuration Popup and select "Use SQLite 3 database instead SAP" (6)
+
+
 ### Dataset management (upload, download, delete) (Pedro)
 
 In the data management page, you are given the possibility to either extract logs from the SAP or to upload them from your local file system. 
