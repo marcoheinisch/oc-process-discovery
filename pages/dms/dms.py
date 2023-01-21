@@ -1,5 +1,8 @@
 import dash
 import os
+
+import dash_table
+import numpy as np
 import pm4py
 import dash_bootstrap_components as dbc
 from dash import Dash, dcc, html, ctx
@@ -11,6 +14,8 @@ from app import app
 from utils.constants import UPLOAD_DIRECTORY
 from extraction.extraction import extract_ocel
 from filtering.filtering import filtering_panel
+import copy
+import re
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -121,6 +126,29 @@ layout = html.Div([
         ])
     # Global dms div
     ], style={'width': '40%', 'display': 'inline-block', 'padding': '10px'}),
+    html.Div([
+            html.H6(
+                "Statistics of your event log",
+            ),
+            html.Label(
+                id='log-statistics-label',
+                children='Select a log first!'
+            ),
+            html.Hr(),
+            dash_table.DataTable(
+                id='log-statistics-table'
+            ),
+        ],
+        style=
+            {
+            'width': '60%',
+            'display': 'inline-block',
+            'padding': '10px',
+            'float': 'right',
+            'margin': '20rm',
+        },
+
+    ),
 
 ])
 
@@ -249,3 +277,24 @@ def download(button_clicks, filename):
     filename = os.path.join(UPLOAD_DIRECTORY, key.rpartition('.jsonocel')[0] + '_downloaded.jsonocel')
     pm4py.write_ocel(ocel, filename)
     return dcc.send_file(filename)
+
+@app.callback(Output('log-statistics-label', 'children'),
+    Output('log-statistics-table', 'data'),
+    Input('uploaded-files-checklist', 'children'),
+    Input('filter-trigger-3', 'n-clicks'),)
+def set_statistics(value1, value2):
+    ocel = copy.deepcopy(log_management.load_version_control(dms.dms.SingletonClass().selected))
+    df = ocel.get_extended_table()
+    df.rename(columns=lambda x: re.sub(r'\W+', '_', x), inplace=True)
+    df.replace({np.nan: 'N/A'}, inplace=True)
+    def flatten_lists(val):
+        if isinstance(val, list):
+            return ','.join(val)
+        return val
+
+    df = df.applymap(flatten_lists)
+    columns = [{'name': col, 'id': col} for col in df.columns]
+    print(df)
+    print(df.to_dict('records')[0])
+    message = str(ocel).replace("Please use <THIS>.get_extended_table() to get a dataframe representation of the events related to the objects.", "")
+    return message, df.to_dict('records')
