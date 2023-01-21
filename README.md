@@ -75,10 +75,13 @@ To understand how the buttons work, one first needs to account for the mechanics
 - Together with the next button, **Save all**, the rollbacks enable you to version-control your datasets. After a given number of filtering steps, you can save your changes into a new file (with a name having a "_filtered" suffix). The original branch is then reset to the state before filtering. This functionality can also be used to copy files (after zero steps). Subsequently, the newly created file is automatically selected and so any next step will be applied to the old and not to the new file. 
   * Be careful: all intermediate states are deleted after saving changes to a new file. This means that rollback does not work on the new file anymore (or on the old one, since its state is reset too).
   * Don't worry about the filename resolution too much. If a filename is already in use, we will definitely find a free one!
+  * You DO NOT have to save changes if you want to download the event log in its current form.
 - Finally, **Clear all** is the Big Reset option that will come in handy once you want to move to a new task or start again from scratch. It will delete all files together with their intermediate states and replace them with a singular example event-log. It can thus be understood as a cache-cleaning tool and is also invoked on start-up of the application, preventing memory leaks and making sure it will not get cluttered after longer use. The user should consider either rebooting or pressing that button from time to time (given that they can export their more well-baked event logs and import them in a new instance anyway) instead of running the same instance indefinitely.
 ### Analysis (Jean)
 
 ## Troubleshooting
+* It is possible that by filtering by event attributes you will, incidentally, filter out all event traces corresponding to a specific object type. You may therefore get a KeyError concerning this object type, since pm4py assumes that 
+* If you press **Download** without pressing **Save all** first, you will download the most recent state (after filtering) of the event log to be sure but bear in mind that the old file will still preserve changes done to it. Meaning, if you uploaded that file again, the two event logs would be the same. Although it is the desired behavior, it differs from when you would just save the changes: then, the old file would be reset and the new one would preserve the changes.
 
 ## Further information
 Links to the documentation of the used libraries and frameworks.
