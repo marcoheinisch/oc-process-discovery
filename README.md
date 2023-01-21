@@ -45,16 +45,18 @@ Note: Because SAPnwRFC is Platform-dependent and can't be shared in this reposit
 ## OCEL Extraction
 You can use this tool to extract a OCEL containing O2C related events from SAP 4/hana. Alternative from that, you can extract from a SQLite database containing the required SAP tables.
 
-Our tool queries the tables *VBFA*, *VBAK* as well as *BSAD*, *CDHDR* and *CDPOS*. From these tables, information about SAP-table-documents that are related to the Order-To-Cash process (e.g. Inquiry, Order, ....) are extracted and used to generate an OCEL. We only prefilter these information by a from-to date range configurable in the Configuration Popup.
+Our tool queries the tables *VBFA*, *VBAK* as well as *BSAD*, *CDHDR* and *CDPOS*. From these tables, information about SAP-table-documents that are related to the Order-To-Cash process (e.g. Inquiry, Order, ....) are extracted and used to generate an OCEL. 
 
 In the app, all configurable parameters and settings related to the extraction are placed in a configuration popup:
+
+<img src="assets/images/extraction_config.PNG" alt="Configuration Popup" style="max-width: 600px;"/>
 
 ### Extraction from SAP Cloud
 To use this feature, you have to set the connection parameters and credentials for your SAP instance. You can either set these in the `.env` file before start, or change these in the Configuration Popup:
 
-1. In data-view, click on Configuration (2)
+1. In data-view, click on `CONFIG`
 2. In the popup: Select the parameter you want to change in the dropdown (3) type the new value (4) and click save (5).
-3. Make sure your device is allowed to connect with SAP. After everything is set, close the Popup and start Extraction (5).
+3. Make sure your device is allowed to connect with SAP. After everything is set, close the Popup and start Extraction.
 
 ### Extraction from SQLite
 A SQLite with sample data is included in this repository. To use your data, you have to provide an own SQLite database.
@@ -63,20 +65,22 @@ An example script for creating a SQLite Database the tool can process is given h
 
 Replace the `sap_tables.sqlite` or if you use Docker, mount a SQLite volume as described in the section Setup. After that, follow these steps:
 
-1. In data-view, click on Configuration (2)
-2. Select *"Use SQLite 3 database instead SAP"* (6)
-3. Start Extraction (5).
+1. In data-view, click on `CONFIG`
+2. Select `Use SQLite 3 database instead SAP` (6)
+3. Close the Popup and start Extraction.
 
 ### Change prefilter: date range
-   1. In data-view, click on Configuration (2)
-   2. In the popup: Type the new values in the date fields (4) and click save (5).
+Currently we only prefilter event information by a date range which is configurable in the Configuration Popup:
+
+1. In data-view, click on `CONFIG`
+2. In the popup: Type the new values in the date fields (4) and click save (5).
 
 ## Dataset management
-In the data management page, you are given the possibility to either extract logs from the SAP or to upload them from your local file system.
+In the data management page, you are given the possibility to either extract logs as discribed, download or to upload them from your local file system:
 
-To do this the first way, simply click on the button "EXTRACT FROM SAP". A message should then appear on your screen, below the extraction button, telling you if the extraction was successful or not. Besides this button, you may notice that there is also another one, where "CONFIG" is written. Its main function is to allow you to configure all SAP connection parameters, which are: user, passwd, ashost, saprouter, msserv, sysid, group, client, lang and trace. If you want you update one of those parameters, simply click on this button. A modal will then appear, where a drop-down menu with all the parameters is given. Choose the parameter you want to update, enter its new value, and then save your changes. A message should also appear under the "SAVE" button, telling you which parameter has been successfully updated.
+<img src="assets/images/dms_all.PNG" alt="Configuration Popup" style="max-width: 600px;"/>
 
-If, instead of uploading logs from the SAP, you want to upload them from your own local file system, simply click on the button "Upload .jsonocel files". Your local file system should then pop up, enabling you to upload any desired file. Please note, however, that only .jsonocel files are accepted.
+If, instead of uploading logs from the SAP, you want to upload them from your own local file system, simply click on the button `Upload .jsonocel files`. Your local file system should then pop up, enabling you to upload any desired file. Please note, however, that only .jsonocel files are accepted.
 
 All your extracted and/or uploaded files should be visible in the section "View and select file for analysis". There, you will have not only the possibility of selecting specific files to be deleted, but also to be downloaded. All files will then be ready to be filtered, as we will see now thoroughly in the next section.
 
@@ -85,6 +89,8 @@ All your extracted and/or uploaded files should be visible in the section "View 
 ## Analysis (Jean)
 
 ## Troubleshooting
+- The error "No events to process." is shown when no events are found in the log. This can happen when the prefilter is set to a date range that does not contain any events. To fix this, change the prefilter in the configuration popup.
+- If you get an error like "No module named 'sapnwrfc'", you have to install the SAP NetWeaver RFC SDK to extract directly from SAP. 
 
 # Further information
 Tools:

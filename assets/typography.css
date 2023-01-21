@@ -3,6 +3,7 @@ body {
 }
 
 #markdown-content h1{
+    margin-top: 2rem;
     font-size: 3.0rem;
 }
 #markdown-content h2{
