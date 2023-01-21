@@ -41,12 +41,12 @@ On the same [data management page](dms) you can find a Filtering segment that pr
 2. Pick a list of values for that attribute from the dropdown that appeared after that.
 3. Positive/Negative - here you have to decide whether you want to leave the values chosen in the data (Positive) or their complement (Negative)
 
-This is how that would could be implemented in the backend:
+This is how that would be implemented in the backend:
 ```
 filtered_ocel = pm4py.filter_ocel_event_attribute(ocel, "ocel:activity", ["Item out of stock", "Fuel Car", "Reorder Item"], positive=False)
 ```
-... and here's how you can do that using the UI:
-![After](docs/images/filtering/event/after.png)
+... and here's how you can achieve the same result with minimal effort using our UI:
+![Event filtering](docs/images/filtering/event/event_filtering.gif)
 
 ### Analysis (Jean)
 
