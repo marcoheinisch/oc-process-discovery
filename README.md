@@ -49,7 +49,7 @@ All your extracted and/or uploaded files should be visible in the section "View 
 ### Filtering datasets (Kacper)
 On the same [data management page](dms) you can find a Filtering segment that presents you with an opportunity to refine your data based on the preliminary analysis results. That way, you can observe how your process models change in relation to minor modifications in the underlying data and draw conclusions accordingly. Our UI offers some tools and options that will make your work more productive and comprehensive:
 #### Filter on Event Attributes
-1. Choose the event attribute that you want to filter by, say "ocel:activity"
+1. Choose the event attribute that you want to filter by, say, "ocel:activity"
 2. Pick a list of values for that attribute from the dropdown that appeared after that.
 3. Positive/Negative - here you have to decide whether you want to leave the values chosen in the data (Positive) or their complement (Negative)
 
@@ -58,14 +58,24 @@ This is how that would be implemented in the backend:
 filtered_ocel = pm4py.filter_ocel_event_attribute(ocel, "ocel:activity", ["Item out of stock", "Fuel Car", "Reorder Item"], positive=False)
 ```
 ... and here's how you can achieve the same result with minimal effort using our UI:
-![Event filtering](docs/images/filtering/event/event_filtering.gif)
+![Event filtering](assets/images/filtering/event/event_filtering.gif)
 
 #### Filter on Allowed Activities per Object Type
 Similarly to Filter on Event Attributes, for the next type of filtering you need to:
-1. Choose the object typ that you want to filter by, say "order"
-2. Set the Positive/Negative
-3. Positive/Negative - here you have to decide whether you want to leave the values chosen in the data (Positive) or their complement (Negative)
 
+1. Choose the object type that you want to filter by, e.g. "order"
+2. Set the Positive/Negative flag
+![Object filtering](assets/images/filtering/object/object_filtering.gif)
+
+#### Buttons
+To understand how the buttons work, one first needs to account for the mechanics behind filtering in this application and how it is interconnected with the data management system.
+- First of all, filtering is carried out discretely (in steps) by pressing the **Filter** button. Every step may consist of one or more filtering options being used: this is done to make your work more efficient. If it makes sense to keep a couple of different filtering substeps part of the same logical step, you are more then welcome to apply more then one filter at the same time. 
+- If you follow this path, it will be easier to go back in time using the **Rollback** button. Rollback reverts to the state of the data before the last filtering step was applied (so, basically, before you pressed the Filter button). 
+- Sometimes, you may want to decide to abandon your changes to the data completely even after going through multiple filtering steps. This can be done using the **Rollback all** button. It gives you the guarantee of going back to the original state of the selected file.
+- Together with the next button, **Save all**, the rollbacks enable you to version-control your datasets. After a given number of filtering steps, you can save your changes into a new file (with a name having a "_filtered" suffix). The original branch is then reset to the state before filtering. This functionality can also be used to copy files (after zero steps). Subsequently, the newly created file is automatically selected and so any next step will be applied to the old and not to the new file. 
+  * Be careful: all intermediate states are deleted after saving changes to a new file. This means that rollback does not work on the new file anymore (or on the old one, since its state is reset too).
+  * Don't worry about the filename resolution too much. If a filename is already in use, we will definitely find a free one!
+- Finally, **Clear all** is the Big Reset option that will come in handy once you want to move to a new task or start again from scratch. It will delete all files together with their intermediate states and replace them with a singular example dataset. It can thus be understood as a cache-cleaning tool and is also invoked on start-up of the application, preventing memory leaks and making sure it will not get cluttered after longer use. The user should consider either rebooting or pressing that button from time to time (given that they can export their more well-baked event logs and import them in a new instance anyway) instead of running the same instance indefinitely.
 ### Analysis (Jean)
 
 ## Troubleshooting
