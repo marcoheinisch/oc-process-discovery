@@ -48,6 +48,12 @@ filtered_ocel = pm4py.filter_ocel_event_attribute(ocel, "ocel:activity", ["Item 
 ... and here's how you can achieve the same result with minimal effort using our UI:
 ![Event filtering](docs/images/filtering/event/event_filtering.gif)
 
+#### Filter on Allowed Activities per Object Type
+Similarly to Filter on Event Attributes, for the next type of filtering you need to:
+1. Choose the object typ that you want to filter by, say "order"
+2. Set the Positive/Negative
+3. Positive/Negative - here you have to decide whether you want to leave the values chosen in the data (Positive) or their complement (Negative)
+
 ### Analysis (Jean)
 
 ## Troubleshooting
