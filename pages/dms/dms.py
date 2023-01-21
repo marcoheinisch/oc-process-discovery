@@ -63,6 +63,7 @@ layout = html.Div([
 
             ),
             html.Div(id='output-jsonocel-upload', style={'width': '100%'}),
+            html.P(),
             html.Button(
                 'Clear all',
                 id='clear-button',
@@ -81,6 +82,7 @@ layout = html.Div([
         
         # Data management component
         html.Div([
+            html.Hr(style={}),
             html.H6("View and select File for analysis"),
             #html.Div(html.B("Your files")),
             dcc.RadioItems(id='uploaded-files-checklist', options=[], style={'width': '100%'}),
@@ -281,7 +283,7 @@ def download(button_clicks, filename):
 @app.callback(Output('log-statistics-label', 'children'),
     Output('log-statistics-table', 'data'),
     Input('uploaded-files-checklist', 'children'),
-    Input('filter-trigger-3', 'n-clicks'),)
+    Input('filter-trigger-4', 'n-clicks'),)
 def set_statistics(value1, value2):
     ocel = log_management.get_ocel()
     df = ocel.get_extended_table()

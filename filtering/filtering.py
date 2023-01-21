@@ -16,6 +16,7 @@ import dms.dms
 from utils.constants import analyse_page_location, dms_page_location
 
 import pandas as pd
+from datetime import date
 
 
 # panel components
@@ -48,8 +49,7 @@ delete_file_label = html.Label(
 # Filter on Event Attributes
 event_attribute_label = html.Label(
     id='event-attribute-label',
-    hidden="hidden",
-    children='Filtering on Event Attributes has been successfully applied!'
+    children='Filtering on Event Attributes:'
 )
 
 event_attribute_dropdown = dcc.Dropdown(
@@ -76,8 +76,7 @@ event_attribute_positive_radio = dcc.RadioItems(
 # Filter on Object Attributes
 object_attribute_label = html.Label(
     id='object-attribute-label',
-    hidden="hidden",
-    children='Filtering on Object Attributes has been successfully applied!'
+    children='Filtering on Object Types:'
 )
 
 
@@ -102,17 +101,18 @@ object_attribute_positive_radio = dcc.RadioItems(
     labelStyle={'display': 'inline-block'}
 )
 
-dcc.DatePickerSingle(
-    id='start-date',
-    date=str(pd.to_datetime('today').date())
-),
-dcc.DatePickerSingle(
-    id='end-date',
-    date=str(pd.to_datetime('today').date()),
-    min_date_allowed=str(pd.to_datetime('today').date()),
-    max_date_allowed=str(pd.to_datetime('today').date()),
-),
+date_picker = dcc.DatePickerRange(
+    id='date-picker',
+    min_date_allowed=min(set(log_management.get_ocel().events['ocel:timestamp'])).date(),
+    max_date_allowed=max(set(log_management.get_ocel().events['ocel:timestamp'])).date(),
+    start_date=min(set(log_management.get_ocel().events['ocel:timestamp'])).date(),
+    end_date=max(set(log_management.get_ocel().events['ocel:timestamp'])).date()
+)
 
+date_picker_label = html.Label(
+    id='date-picker-label',
+    children='Filtering on Event Timestamp:'
+)
 
 # callbacks
 # Filter on Event Attributes callbacks
@@ -210,7 +210,20 @@ def update_object_attribute_checkboxes(keys, children):
 def update_object_attribute_positive_flag(value):
     return value
 
-
+@app.callback(
+    Output('date-picker', 'min_date_allowed'),
+    Output('date-picker', 'max_date_allowed'),
+    Output('date-picker', 'start_date'),
+    Output('date-picker', 'end_date'),
+    Input('filter-trigger-4', 'n-clicks'),
+    Input('uploaded-files-checklist', 'value'),
+)
+def update_date_picker(button_clicks, value):
+    min_date_allowed = min(set(log_management.get_ocel().events['ocel:timestamp'])).date()
+    max_date_allowed = max(set(log_management.get_ocel().events['ocel:timestamp'])).date()
+    start_date = min_date_allowed
+    end_date = max_date_allowed
+    return min_date_allowed, max_date_allowed, start_date, end_date
 # define callback for rollback
 @app.callback(
     Output('uploaded-files-checklist', 'value'),
@@ -335,7 +348,7 @@ def delete(button_clicks, children):
     Output('event-attribute-dropdown', 'value'),
     Output('event-attribute-checkboxes', 'children'),
     Output('event-attribute-positive-radio', 'value'),
-    Output('event-attribute-label', 'hidden'),
+    Output('event-attribute-label', 'children'),
     Output('filter-trigger-2', 'n-clicks'),
     Input('filter-trigger-1', 'n-clicks'),
     State('uploaded-files-checklist', 'value'),
@@ -345,7 +358,7 @@ def delete(button_clicks, children):
 )
 def filter_on_event_attributes(button_clicks, filename, keys, children, positive):
     if button_clicks is None or button_clicks == 0:
-        return keys, children, positive, 'hidden', 0
+        return keys, children, positive, 'Filtering on Event Attributes:', 0
 
     # load the most recent version of the file
     ocel = log_management.load_version_control(filename)
@@ -358,7 +371,7 @@ def filter_on_event_attributes(button_clicks, filename, keys, children, positive
         selected_values[key] = value
 
     if not keys:
-        return [], [], False, 'hidden', button_clicks
+        return [], [], False, 'Filtering on Event Attributes:', button_clicks
 
     # apply filtering per key
     for key in keys:
@@ -367,14 +380,14 @@ def filter_on_event_attributes(button_clicks, filename, keys, children, positive
         ocel = pm4py.filter_ocel_event_attribute(ocel, key, selected_values[key], positive)
 
     log_management.store_version_control(filename, ocel)
-    return [], [], False, None, button_clicks
+    return [], [], False, 'Filtering on Event Attributes has been successfully applied!', button_clicks
 
 
 @app.callback(
     Output('object-attribute-dropdown', 'value'),
     Output('object-attribute-checkboxes', 'children'),
     Output('object-attribute-positive-radio', 'value'),
-    Output('object-attribute-label', 'hidden'),
+    Output('object-attribute-label', 'children'),
     Output('filter-trigger-3', 'n-clicks'),
     Input('filter-trigger-2', 'n-clicks'),
     State('uploaded-files-checklist', 'value'),
@@ -384,7 +397,7 @@ def filter_on_event_attributes(button_clicks, filename, keys, children, positive
 )
 def filter_on_object_attributes(button_clicks, filename, keys, children, positive):
     if button_clicks is None or button_clicks == 0:
-        return keys, children, positive, 'hidden', 0
+        return keys, children, positive, "Filtering on Object Types:", 0
 
     # load the most recent version of the file
     ocel = log_management.load_version_control(filename)
@@ -397,7 +410,7 @@ def filter_on_object_attributes(button_clicks, filename, keys, children, positiv
         selected_values[key] = value
 
     if not keys:
-        return [], [], False, 'hidden', button_clicks
+        return [], [], False, "Filtering on Object Types:", button_clicks
 
     # apply filtering per key
     for key in keys:
@@ -406,7 +419,26 @@ def filter_on_object_attributes(button_clicks, filename, keys, children, positiv
         ocel = pm4py.filter_ocel_object_attribute(ocel, key, selected_values[key], positive)
 
     log_management.store_version_control(filename, ocel)
-    return [], [], False, None, button_clicks
+    return [], [], False, "Filtering on Object Types has been successfully applied!", button_clicks
+
+@app.callback(
+    Output('date-picker-label', 'children'),
+    Output('filter-trigger-4', 'n-clicks'),
+    Input('filter-trigger-3', 'n-clicks'),
+    State('uploaded-files-checklist', 'value'),
+    State('date-picker', 'start_date'),
+    State('date-picker', 'end_date'),
+    State('date-picker', 'min_date_allowed'),
+    State('date-picker', 'max_date_allowed'),
+)
+def filter_on_event_timestamp(button_clicks, filename, start_date, end_date, min_date_allowed, max_date_allowed):
+    if button_clicks is None or button_clicks == 0 or (start_date == min_date_allowed and end_date == max_date_allowed):
+        return 'Filtering on Event Timestamp:', button_clicks
+
+    ocel = log_management.get_ocel()
+    ocel = pm4py.filter_ocel_events_timestamp(ocel, str(start_date) + " 00:00:00", str(end_date) + " 23:59:59", timestamp_key="ocel:timestamp")
+    log_management.store_version_control(filename, ocel)
+    return "Filtering on Event Timestamp has been successfully applied!", button_clicks
 
 
 # create layout
@@ -426,14 +458,24 @@ filtering_panel = [
             n_clicks=0,
             hidden=True
         ),
+        html.Button(
+            id='filter-trigger-4',
+            n_clicks=0,
+            hidden=True
+        ),
         event_attribute_label,
         event_attribute_dropdown,
         event_attribute_checkboxes,
         event_attribute_positive_radio,
+        html.P(),
         object_attribute_label,
         object_attribute_dropdown,
         object_attribute_checkboxes,
         object_attribute_positive_radio,
+        html.P(),
+        date_picker_label,
+        date_picker,
+        html.P(),
         html.Button(
             'Filter',
             id='filter-button',
