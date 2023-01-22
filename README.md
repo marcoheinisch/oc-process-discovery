@@ -88,10 +88,9 @@ Example of a successful filtering: in the first picture you can see the chosen f
 
 Below, in the second picture, is the result log.
 
-<img src="assets/images/filtering/before.PNG" alt="Before filtering" style="width: 100%; margin-bottom: 2%; margin-top: 2%"/>
+<img src="assets/images/filtering/before.PNG" alt="Before filtering" style="width: 100%"/>
 
-
-<img src="assets/images/filtering/after.PNG" alt="After filtering" style="width: 100%; margin-bottom: 2%" />
+<img src="assets/images/filtering/after.PNG" alt="After filtering" style="width: 100%" />
 
 #### Buttons
 To understand how the buttons work, one first needs to account for the mechanics behind filtering in this application and how it is interconnected with the data management system.
