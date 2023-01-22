@@ -60,24 +60,8 @@ layout = html.Div([
                 multiple=True,
                 # Only allow files with the .jsonocel extension to be selected
                 accept=".jsonocel"
-
             ),
             html.Div(id='output-jsonocel-upload', style={'width': '100%'}),
-            html.P(),
-            html.Button(
-                'Clear all',
-                id='clear-button',
-                n_clicks=0,
-                style={
-                    'width': '100%',
-                    'height': '40px',
-                    'lineHeight': '40px',
-                    'borderWidth': '1px',
-                    'borderStyle': 'dashed',
-                    'borderRadius': '5px',
-                    'textAlign': 'center',
-                },
-            ),
         ], style={'width': '100%', 'padding': '10px'}),
         
         # Data management component
@@ -91,6 +75,14 @@ layout = html.Div([
             # Download button
             html.Button("Download", id="download-button", n_clicks=0, style={'width': '50%'}),
             dcc.Download(id="download-file", base64=True),
+            html.Button(
+                'Clear all',
+                id='clear-button',
+                n_clicks=0,
+                style={
+                    'width': '100%',
+                },
+            ),
         ], style={'width': '100%', 'display': 'inline-block', 'vertical-align': 'top'}),
         
         html.Div([
