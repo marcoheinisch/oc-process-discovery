@@ -104,18 +104,25 @@ To understand how the buttons work, one first needs to account for the mechanics
   * You DO NOT have to save changes if you want to download the event log in its current form.
 - Finally, **Clear all** is the Big Reset option that will come in handy once you want to move to a new task or start again from scratch. It will delete all files together with their intermediate states and replace them with a singular example event-log. It can thus be understood as a cache-cleaning tool and is also invoked on start-up of the application, preventing memory leaks and making sure it will not get cluttered after longer use. The user should consider either rebooting or pressing that button from time to time (given that they can export their more well-baked event logs and import them in a new instance anyway) instead of running the same instance indefinitely.
 
-#### Log preview
+There are also two navigation buttons on the data and analysis pages: **Go to analysis** and **Go to dms**. To press any of them is equivalent to choosing the respective page from the sidebar to the left. They serve the sole purpose of cutting down distance from one click to the next.
+
+Below the buttons there is a minimalistic message board that will keep the status of your last action. For example, after pressing the **Rollback all** button:
+
+![Message board](assets/images/message_board.png)
+
+#### Statistics and log preview
 To the right of the data management and filtering segments you can see some statistics of your event log followed by its real-time preview. The neat part: the preview is always up to date with the most recent state of the selected log. As a result, you will be able to observe the changes live, compare different logs and, in general, make more well-informed decisions regarding your next steps.
+
 ### Analysis (Jean)
 
-## Troubleshooting
+## Troubleshooting & FAQ
 * One of the algorithms, pm4py, runs into a KeyError if the user filters out all event attributes except for one. This seems to have to do with the internal implementation of pm4py which doesn't consider border cases after filtering has been applied/doesn't update its knowledge base. In this case, please use one of the two remaining algorithms.
-* Pm4py also presupposes that default values be defined for ocel:global-event and ocel:global-object in your log. Therefore, you may get a respective KeyError if you upload a log yourself and do not use the extraction function. You can use one of the other algorithms or add the following lines to your log file to remedy this:
+* Pm4py also presupposes that default values be defined for ocel:global-event and ocel:global-object in your log. Therefore, you may get a respective KeyError if you upload the log yourself and do not use the extraction function. You can use one of the other algorithms or add the following lines to your log file to remedy this:
     ```
       "ocel:global-event": "default",
       "ocel:global-object": "default",
     ```
-* If you press **Download** without pressing **Save all** first, you will download the most recent state (after filtering) of the event log to be sure but bear in mind that the old file will still preserve changes done to it. Meaning, if you uploaded that file again, the two event logs would be the same. Although it is the desired behavior, it differs from when you would just save the changes: then, the old file would be reset and the new one would preserve the changes.
+* If you press **Download** without pressing **Save all** first, you will download the most recent state (after filtering) of the event log to be sure but bear in mind that the old file will still preserve changes done to it. That means: if you upload that file again, the two event logs will be the same. Although that is the desired behavior, it differs from when you would just save the changes: then, the old file would be reset and the new one would preserve the changes.
 
 ## Further information
 Links to the documentation of the used libraries and frameworks.
