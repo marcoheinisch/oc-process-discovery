@@ -1,7 +1,7 @@
 import dash
 import os
 
-import dash_table
+from dash import dash_table
 import numpy as np
 import pm4py
 import dash_bootstrap_components as dbc
