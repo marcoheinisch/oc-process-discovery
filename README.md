@@ -1,7 +1,7 @@
 # OC-Process-Discovery
 A process discovery tool working on object-centric event logs extracted from SAP ERP. It was developed in the "Process Discovery Using Python" lab at RWTH. 
-# Setup
-## Manual setup: Python venv
+## Setup
+### Manual setup: Python venv
 This project runs on Python 3.9.13
 1. Create virtual environment. For example with `python -m venv venv`
 2. Activate virtual environment. For example with `source venv/bin/activate` or `venv\Scripts\activate.ps1` 
@@ -10,16 +10,16 @@ This project runs on Python 3.9.13
 5. Run project / index.py
    1. in vs code: use the configuration stored in launch.json file
    2. in pycharm: use the configuration stored in .idea/runConfigurations/oc_process_discovery.xml file
-## Docker setup
+### Docker setup
 Note: Because SAPnwRFC is Plattform depencent and can't be shared in this repository due to lizensing, Extraction directly from SAP systems is yet not possible in Docker.
 1. Check if pyrfc is commented out in requiremnts.txt
 2. Build docker image: `docker build -t ocpaapp .`
 3. Run image: `docker run --name ocpa -p 8084:8085 ocpaapp   `
-# Usage
-## Overview (Jean)
-## Extraction from SAP (Marco)
+## Usage
+### Overview (Jean)
+### Extraction from SAP (Marco)
 You can use this tool to extract a OCEL containing O2C related events from SAP 4/hana or alternative from a sqlite database cotaining needed SAP tables. 
-### Extraction from SAP Cloud
+#### Extraction from SAP Cloud
 To use this feature you have to set the connection parameters and credentials for you SAP instancence:
 1. In data-view click on Configuration (2) 
 
@@ -36,6 +36,7 @@ You don't have to set SAP credentials. Instead go to Configuration Popup and sel
 
 
 ### Dataset management (upload, download, delete) (Pedro)
+<img src="assets/images/dms/dms_page.png" alt="Image of the data management page" style="width: 100%; margin-bottom: 2%"/>
 
 In the data management page, you are given the possibility to either extract logs from the SAP or to upload them from your local file system. 
 
@@ -49,23 +50,48 @@ All your extracted and/or uploaded files should be visible in the section "View 
 ### Filtering datasets (Kacper)
 On the same [data management page](dms) you can find a Filtering segment that presents you with an opportunity to refine your data based on the preliminary analysis results. That way, you can observe how your process models change in relation to minor modifications in the underlying data and draw conclusions accordingly. Our UI offers some tools and options that will make your work more productive and comprehensive:
 #### Filter on Event Attributes
-1. Choose the event attribute that you want to filter by, say, "ocel:activity"
-2. Pick a list of values for that attribute from the dropdown that appeared after that.
-3. Positive/Negative - here you have to decide whether you want to leave the values chosen in the data (Positive) or their complement (Negative). Negative is chosen as default.
+1. Choose the event attribute that you want to filter by, e.g. *ocel:activity*
+2. Pick a *list of values* for that attribute from the dropdown that appears after that.
+3. *Positive/Negative* - here you have to decide whether you want to leave the values chosen in the data (Positive) or their complement (Negative). Negative is chosen as default.
 
-This is how that would be implemented in the backend:
+Example from the backend:
 ```
 filtered_ocel = pm4py.filter_ocel_event_attribute(ocel, "ocel:activity", ["Item out of stock", "Fuel Car", "Reorder Item"], positive=False)
 ```
-... and here's how you can achieve the same result with minimal effort using our UI:
-![Event filtering](assets/images/filtering/event/event_filtering.gif)
 
-#### Filter on Allowed Activities per Object Type
+#### Filter on Object Attributes
 Similarly to Filter on Event Attributes, for the next type of filtering you need to:
 
-1. Choose the object type that you want to filter by, e.g. "order"
-2. Set the Positive/Negative flag (Negative as default)
-![Object filtering](assets/images/filtering/object/object_filtering.gif)
+1. Choose the object attribute that you want to filter by, e.g. *ocel:type*
+2. Pick a *list of values* for that attribute from the dropdown that appears after that.
+3. Set the *Positive/Negative* flag (Negative as default)
+
+Example from the backend:
+```
+filtered_ocel = pm4py.filter_ocel_object_attribute(ocel, "ocel:type", ["order", "delivery"], positive=True)
+```
+
+#### Filter on Event Timestamp
+By picking a *start date* and an *end date* you can restrict your event log to the chosen time interval. This can prove a useful functionality when confronted with a process that may fluctuate over time, e.g. as a result of a varying strain on the process, introduction of new events, change in procedures, etc. The user should not worry about picking an invalid time interval - the boundaries are already set based on the log in consideration.
+
+Example from the backend:
+```
+filtered_ocel = pm4py.filter_ocel_events_timestamp(ocel, "1981-01-01 00:00:00", "1982-01-01 00:00:00", timestamp_key="ocel:timestamp")
+```
+
+#### All three filters combined: an example
+Example of a successful filtering: in the first picture you can see the chosen filtering options and the log before the filters have been applied. Our setting are:
+
+1. Leave all ***Reorder item*** events out.
+2. Filter all objects of type ***delivery*** out.
+3. Consider only the month of ***November***.
+
+Below, in the second picture, is the result log.
+
+<img src="assets/images/filtering/before.PNG" alt="Before filtering" style="width: 100%; margin-bottom: 2%; margin-top: 2%"/>
+
+
+<img src="assets/images/filtering/after.PNG" alt="After filtering" style="width: 100%; margin-bottom: 2%" />
 
 #### Buttons
 To understand how the buttons work, one first needs to account for the mechanics behind filtering in this application and how it is interconnected with the data management system.
@@ -77,10 +103,18 @@ To understand how the buttons work, one first needs to account for the mechanics
   * Don't worry about the filename resolution too much. If a filename is already in use, we will definitely find a free one!
   * You DO NOT have to save changes if you want to download the event log in its current form.
 - Finally, **Clear all** is the Big Reset option that will come in handy once you want to move to a new task or start again from scratch. It will delete all files together with their intermediate states and replace them with a singular example event-log. It can thus be understood as a cache-cleaning tool and is also invoked on start-up of the application, preventing memory leaks and making sure it will not get cluttered after longer use. The user should consider either rebooting or pressing that button from time to time (given that they can export their more well-baked event logs and import them in a new instance anyway) instead of running the same instance indefinitely.
+
+#### Log preview
+To the right of the data management and filtering segments you can see some statistics of your event log followed by its real-time preview. The neat part: the preview is always up to date with the most recent state of the selected log. As a result, you will be able to observe the changes live, compare different logs and, in general, make more well-informed decisions regarding your next steps.
 ### Analysis (Jean)
 
 ## Troubleshooting
-* It is possible that by filtering by event attributes you will, incidentally, filter out all event traces corresponding to a specific object type. You may therefore get a KeyError concerning this object type, since pm4py assumes that 
+* One of the algorithms, pm4py, runs into a KeyError if the user filters out all event attributes except for one. This seems to have to do with the internal implementation of pm4py which doesn't consider border cases after filtering has been applied/doesn't update its knowledge base. In this case, please use one of the two remaining algorithms.
+* Pm4py also presupposes that default values be defined for ocel:global-event and ocel:global-object in your log. Therefore, you may get a respective KeyError if you upload a log yourself and do not use the extraction function. You can use one of the other algorithms or add the following lines to your log file to remedy this:
+    ```
+      "ocel:global-event": "default",
+      "ocel:global-object": "default",
+    ```
 * If you press **Download** without pressing **Save all** first, you will download the most recent state (after filtering) of the event log to be sure but bear in mind that the old file will still preserve changes done to it. Meaning, if you uploaded that file again, the two event logs would be the same. Although it is the desired behavior, it differs from when you would just save the changes: then, the old file would be reset and the new one would preserve the changes.
 
 ## Further information

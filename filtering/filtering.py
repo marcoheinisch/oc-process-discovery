@@ -76,7 +76,7 @@ event_attribute_positive_radio = dcc.RadioItems(
 # Filter on Object Attributes
 object_attribute_label = html.Label(
     id='object-attribute-label',
-    children='Filtering on Object Types:'
+    children='Filtering on Object Attributes:'
 )
 
 
@@ -397,7 +397,7 @@ def filter_on_event_attributes(button_clicks, filename, keys, children, positive
 )
 def filter_on_object_attributes(button_clicks, filename, keys, children, positive):
     if button_clicks is None or button_clicks == 0:
-        return keys, children, positive, "Filtering on Object Types:", 0
+        return keys, children, positive, "Filtering on Object Attributes:", 0
 
     # load the most recent version of the file
     ocel = log_management.load_version_control(filename)
@@ -410,7 +410,7 @@ def filter_on_object_attributes(button_clicks, filename, keys, children, positiv
         selected_values[key] = value
 
     if not keys:
-        return [], [], False, "Filtering on Object Types:", button_clicks
+        return [], [], False, "Filtering on Object Attributes:", button_clicks
 
     # apply filtering per key
     for key in keys:
@@ -419,7 +419,7 @@ def filter_on_object_attributes(button_clicks, filename, keys, children, positiv
         ocel = pm4py.filter_ocel_object_attribute(ocel, key, selected_values[key], positive)
 
     log_management.store_version_control(filename, ocel)
-    return [], [], False, "Filtering on Object Types has been successfully applied!", button_clicks
+    return [], [], False, "Filtering on Object Attributes has been successfully applied!", button_clicks
 
 @app.callback(
     Output('date-picker-label', 'children'),
