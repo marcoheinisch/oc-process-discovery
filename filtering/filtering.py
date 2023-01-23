@@ -15,6 +15,9 @@ from utils.constants import UPLOAD_DIRECTORY
 import dms.dms
 from utils.constants import analyse_page_location, dms_page_location
 
+import pandas as pd
+from datetime import date
+
 
 # panel components
 save_changes_label = html.Label(
@@ -22,32 +25,42 @@ save_changes_label = html.Label(
     hidden="hidden",
     children='The filtered log has been successfully saved!'
 )
+delete_changes_label = html.Label(
+    id='delete-changes-label',
+    hidden="hidden",
+    children='The selected file has been successfully deleted!'
+)
 
 
 filtering_label = html.Label(
     id='filtering-label',
     hidden="hidden",
-    children='Filtering has been succesfully applied!'
+    children='Filtering has been successfully applied!'
+)
+
+rollback_label = html.Label(
+    id='rollback-label',
+    hidden="hidden",
+    children='Rollback has been successfully applied!'
 )
 
 clear_label = html.Label(
     id='clear-label',
     hidden="hidden",
-    children='The uploaded files and their filtered versions have been succesfully cleared!'
+    children='The uploaded files and their filtered versions have been successfully cleared!'
 )
 
 delete_file_label = html.Label(
     id='delete-file-label',
     hidden="hidden",
-    children='The selected file has been succesfully deleted!'
+    children='The selected file has been successfully deleted!'
 )
 
 
 # Filter on Event Attributes
 event_attribute_label = html.Label(
     id='event-attribute-label',
-    hidden="hidden",
-    children='Filtering on Event Attributes has been successfully applied!'
+    children='Filtering on Event Attributes:'
 )
 
 event_attribute_dropdown = dcc.Dropdown(
@@ -67,15 +80,14 @@ event_attribute_checkboxes = html.Div(
 event_attribute_positive_radio = dcc.RadioItems(
     id='event-attribute-positive-radio',
     options=[{'label': 'positive', 'value': True}, {'label': 'negative', 'value': False}],
-    value=True,  # default value
+    value=False,  # default value
     labelStyle={'display': 'inline-block'}
 )
 
 # Filter on Object Attributes
 object_attribute_label = html.Label(
     id='object-attribute-label',
-    hidden="hidden",
-    children='Filtering on Object Attributes has been successfully applied!'
+    children='Filtering on Object Attributes:'
 )
 
 
@@ -96,10 +108,22 @@ object_attribute_checkboxes = html.Div(
 object_attribute_positive_radio = dcc.RadioItems(
     id='object-attribute-positive-radio',
     options=[{'label': 'positive', 'value': True}, {'label': 'negative', 'value': False}],
-    value=True,  # default value
+    value=False,  # default value
     labelStyle={'display': 'inline-block'}
 )
 
+date_picker = dcc.DatePickerRange(
+    id='date-picker',
+    min_date_allowed=min(set(log_management.get_ocel().events['ocel:timestamp'])).date(),
+    max_date_allowed=max(set(log_management.get_ocel().events['ocel:timestamp'])).date(),
+    start_date=min(set(log_management.get_ocel().events['ocel:timestamp'])).date(),
+    end_date=max(set(log_management.get_ocel().events['ocel:timestamp'])).date()
+)
+
+date_picker_label = html.Label(
+    id='date-picker-label',
+    children='Filtering on Event Timestamp:'
+)
 
 # callbacks
 # Filter on Event Attributes callbacks
@@ -197,10 +221,29 @@ def update_object_attribute_checkboxes(keys, children):
 def update_object_attribute_positive_flag(value):
     return value
 
-
+@app.callback(
+    Output('date-picker', 'min_date_allowed'),
+    Output('date-picker', 'max_date_allowed'),
+    Output('date-picker', 'start_date'),
+    Output('date-picker', 'end_date'),
+    Input('filter-trigger-4', 'n-clicks'),
+    Input('uploaded-files-checklist', 'value'),
+)
+def update_date_picker(button_clicks, value):
+    min_date_allowed = min(set(log_management.get_ocel().events['ocel:timestamp'])).date()
+    max_date_allowed = max(set(log_management.get_ocel().events['ocel:timestamp'])).date()
+    start_date = min_date_allowed
+    end_date = max_date_allowed
+    return min_date_allowed, max_date_allowed, start_date, end_date
 # define callback for rollback
 @app.callback(
     Output('uploaded-files-checklist', 'value'),
+    Output('rollback-label', 'hidden'),
+    Output('rollback-label', 'children'),
+    Output('save-changes-label', 'hidden'),
+    Output('delete-changes-label', 'hidden'),
+    Output('clear-label', 'hidden'),
+    Output('filtering-label', 'hidden'),
     Input('rollback-button', 'n_clicks'),
 )
 def rollback(button_clicks):
@@ -208,14 +251,24 @@ def rollback(button_clicks):
     selected = singleton_instance.selected
 
     if button_clicks is None or button_clicks == 0:
-        return selected
+        return selected, 'hidden', '', 'hidden', 'hidden', 'hidden', 'hidden'
 
-    log_management.rollback()
-    return selected
+    nr = log_management.rollback()
+    if nr == 0:
+        message = 'No steps to be rolled back!'
+    else:
+        message = 'The last filtering step has been rolled back.'
+    return selected, None, message, 'hidden', 'hidden', 'hidden', 'hidden'
 
 # define callback for rollback_all
 @app.callback(
     Output('uploaded-files-checklist', 'value'),
+    Output('rollback-label', 'hidden'),
+    Output('rollback-label', 'children'),
+    Output('save-changes-label', 'hidden'),
+    Output('delete-changes-label', 'hidden'),
+    Output('clear-label', 'hidden'),
+    Output('filtering-label', 'hidden'),
     Input('rollback-all-button', 'n_clicks'),
 )
 def rollback_all(button_clicks):
@@ -223,10 +276,16 @@ def rollback_all(button_clicks):
     selected = singleton_instance.selected
 
     if button_clicks is None or button_clicks == 0:
-        return selected
+        return selected, 'hidden', '', 'hidden', 'hidden', 'hidden', 'hidden'
 
-    log_management.rollback_all()
-    return selected
+    nr = log_management.rollback_all()
+    if nr == 0:
+        message = 'No steps to be rolled back!'
+    elif nr == 1:
+        message = 'The last and only filtering step has been rolled back.'
+    else:
+        message = str(nr) + ' filtering steps have been rolled back.'
+    return selected, None, message, 'hidden', 'hidden', 'hidden', 'hidden'
 
 
 @app.callback(
@@ -240,13 +299,17 @@ def apply_filtering(button_clicks):
     Output('save-changes-label', 'hidden'),
     Output('output-jsonocel-upload', 'children'),
     Output('uploaded-files-checklist', 'value'),
+    Output('delete-changes-label', 'hidden'),
+    Output('clear-label', 'hidden'),
+    Output('filtering-label', 'hidden'),
+    Output('rollback-label', 'hidden'),
     Input('save-changes-button', 'n_clicks'),
     State('output-jsonocel-upload', 'children'),
     State('uploaded-files-checklist', 'value'),
 )
 def save_changes(button_clicks, upload_children, filename):
     if button_clicks is None or button_clicks == 0:
-        return 'hidden', upload_children, filename
+        return 'hidden', upload_children, filename, 'hidden', 'hidden', 'hidden', 'hidden'
 
     new_filename = filename.rpartition('.jsonocel')[0] + '_filtered.jsonocel'
     path = os.path.join(UPLOAD_DIRECTORY, new_filename)
@@ -255,7 +318,7 @@ def save_changes(button_clicks, upload_children, filename):
 
     log_management.reset_to_original(filename)
 
-    return None, upload_children, new_filename
+    return None, upload_children, new_filename, 'hidden', 'hidden', 'hidden', 'hidden'
 
 @app.callback(
     Output("url", "pathname"),
@@ -283,46 +346,54 @@ def go_to_dms(button_clicks, pathname):
     Output('container-feedback-text', 'children'),
     Output('uploaded-files-checklist', 'value'),
     Output('clear-label', 'hidden'),
+    Output('save-changes-label', 'hidden'),
+    Output('delete-changes-label', 'hidden'),
+    Output('filtering-label', 'hidden'),
+    Output('rollback-label', 'hidden'),
     Input('clear-button', 'n_clicks'),
     State('container-feedback-text', 'children'),
 )
 def clear(button_clicks, children):
     if button_clicks is None or button_clicks == 0:
         selected = dms.dms.SingletonClass().selected
-        return children, selected, 'hidden'
+        return children, selected, 'hidden', 'hidden', 'hidden', 'hidden', 'hidden'
     else:
         log_management.clear()
         selected = dms.dms.SingletonClass().selected
-        return children, selected, None
+        return children, selected, None, 'hidden', 'hidden', 'hidden', 'hidden'
 
 @app.callback(
     Output('container-feedback-text', 'children'),
     Output('uploaded-files-checklist', 'value'),
+    Output('delete-changes-label', 'hidden'),
+    Output('delete-changes-label', 'children'),
     Output('save-changes-label', 'hidden'),
-    Output('save-changes-label', 'children'),
+    Output('clear-label', 'hidden'),
+    Output('filtering-label', 'hidden'),
+    Output('rollback-label', 'hidden'),
     Input('delete-file-button', 'n_clicks'),
     State('container-feedback-text', 'children'),
 )
 def delete(button_clicks, children):
     if button_clicks is None or button_clicks == 0:
         selected = dms.dms.SingletonClass().selected
-        return children, selected, 'hidden', 'The selected file has been succesfully deleted!'
+        return children, selected, 'hidden', 'The selected file has been successfully deleted!', 'hidden', 'hidden', 'hidden', 'hidden'
     else:
-        message = 'The selected file has been succesfully deleted!'
+        message = 'The selected file has been successfully deleted!'
         try:
             log_management.delete_selected()
         except Exception:
             message = "Cannot delete the only file left!"
             pass
         selected = dms.dms.SingletonClass().selected
-        return children, selected, None, message
+        return children, selected, None, message, 'hidden', 'hidden', 'hidden', 'hidden'
 
 
 @app.callback(
     Output('event-attribute-dropdown', 'value'),
     Output('event-attribute-checkboxes', 'children'),
     Output('event-attribute-positive-radio', 'value'),
-    Output('event-attribute-label', 'hidden'),
+    Output('event-attribute-label', 'children'),
     Output('filter-trigger-2', 'n-clicks'),
     Input('filter-trigger-1', 'n-clicks'),
     State('uploaded-files-checklist', 'value'),
@@ -332,7 +403,7 @@ def delete(button_clicks, children):
 )
 def filter_on_event_attributes(button_clicks, filename, keys, children, positive):
     if button_clicks is None or button_clicks == 0:
-        return keys, children, positive, 'hidden', 0
+        return keys, children, positive, 'Filtering on Event Attributes:', 0
 
     # load the most recent version of the file
     ocel = log_management.load_version_control(filename)
@@ -345,7 +416,7 @@ def filter_on_event_attributes(button_clicks, filename, keys, children, positive
         selected_values[key] = value
 
     if not keys:
-        return [], [], True, 'hidden', button_clicks
+        return [], [], False, 'Filtering on Event Attributes:', button_clicks
 
     # apply filtering per key
     for key in keys:
@@ -354,14 +425,14 @@ def filter_on_event_attributes(button_clicks, filename, keys, children, positive
         ocel = pm4py.filter_ocel_event_attribute(ocel, key, selected_values[key], positive)
 
     log_management.store_version_control(filename, ocel)
-    return [], [], True, None, button_clicks
+    return [], [], False, 'Filtering on Event Attributes has been successfully applied!', button_clicks
 
 
 @app.callback(
     Output('object-attribute-dropdown', 'value'),
     Output('object-attribute-checkboxes', 'children'),
     Output('object-attribute-positive-radio', 'value'),
-    Output('object-attribute-label', 'hidden'),
+    Output('object-attribute-label', 'children'),
     Output('filter-trigger-3', 'n-clicks'),
     Input('filter-trigger-2', 'n-clicks'),
     State('uploaded-files-checklist', 'value'),
@@ -371,7 +442,7 @@ def filter_on_event_attributes(button_clicks, filename, keys, children, positive
 )
 def filter_on_object_attributes(button_clicks, filename, keys, children, positive):
     if button_clicks is None or button_clicks == 0:
-        return keys, children, positive, 'hidden', 0
+        return keys, children, positive, "Filtering on Object Attributes:", 0
 
     # load the most recent version of the file
     ocel = log_management.load_version_control(filename)
@@ -384,7 +455,7 @@ def filter_on_object_attributes(button_clicks, filename, keys, children, positiv
         selected_values[key] = value
 
     if not keys:
-        return [], [], True, 'hidden', button_clicks
+        return [], [], False, "Filtering on Object Attributes:", button_clicks
 
     # apply filtering per key
     for key in keys:
@@ -393,7 +464,34 @@ def filter_on_object_attributes(button_clicks, filename, keys, children, positiv
         ocel = pm4py.filter_ocel_object_attribute(ocel, key, selected_values[key], positive)
 
     log_management.store_version_control(filename, ocel)
-    return [], [], True, None, button_clicks
+    return [], [], False, "Filtering on Object Attributes has been successfully applied!", button_clicks
+
+@app.callback(
+    Output('date-picker-label', 'children'),
+    Output('filter-trigger-4', 'n-clicks'),
+    Output('filtering-label', 'hidden'),
+    Output('delete-changes-label', 'hidden'),
+    Output('clear-label', 'hidden'),
+    Output('save-changes-label', 'hidden'),
+    Output('rollback-label', 'hidden'),
+    Input('filter-trigger-3', 'n-clicks'),
+    State('uploaded-files-checklist', 'value'),
+    State('date-picker', 'start_date'),
+    State('date-picker', 'end_date'),
+    State('date-picker', 'min_date_allowed'),
+    State('date-picker', 'max_date_allowed'),
+)
+def filter_on_event_timestamp(button_clicks, filename, start_date, end_date, min_date_allowed, max_date_allowed):
+    if button_clicks is None or button_clicks == 0:
+        return 'Filtering on Event Timestamp:', button_clicks, 'hidden', 'hidden', 'hidden', 'hidden', 'hidden'
+
+    if (start_date == min_date_allowed and end_date == max_date_allowed):
+        return 'Filtering on Event Timestamp:', button_clicks, None, 'hidden', 'hidden', 'hidden', 'hidden'
+
+    ocel = log_management.get_ocel()
+    ocel = pm4py.filter_ocel_events_timestamp(ocel, str(start_date) + " 00:00:00", str(end_date) + " 23:59:59", timestamp_key="ocel:timestamp")
+    log_management.store_version_control(filename, ocel)
+    return "Filtering on Event Timestamp has been successfully applied!", button_clicks, None, 'hidden', 'hidden', 'hidden', 'hidden'
 
 
 # create layout
@@ -413,14 +511,24 @@ filtering_panel = [
             n_clicks=0,
             hidden=True
         ),
+        html.Button(
+            id='filter-trigger-4',
+            n_clicks=0,
+            hidden=True
+        ),
         event_attribute_label,
         event_attribute_dropdown,
         event_attribute_checkboxes,
         event_attribute_positive_radio,
+        html.P(),
         object_attribute_label,
         object_attribute_dropdown,
         object_attribute_checkboxes,
         object_attribute_positive_radio,
+        html.P(),
+        date_picker_label,
+        date_picker,
+        html.P(),
         html.Button(
             'Filter',
             id='filter-button',
@@ -447,13 +555,10 @@ filtering_panel = [
             style={'color': 'white', 'background-color': '#0d6efd'},
             n_clicks=0,
         ),
-        html.Button(
-            'Clear all',
-            id='clear-button',
-            n_clicks=0,
-        ),
         filtering_label,
         save_changes_label,
+        delete_changes_label,
         clear_label,
         delete_file_label,
+        rollback_label,
 ]

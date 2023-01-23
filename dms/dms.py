@@ -137,16 +137,20 @@ class DataManagementSystem:
         singleton_instance = SingletonClass()
         list_key = singleton_instance.selected + '_filter_list'
         filter_list = cls.__load(list_key)
+        nr = len(filter_list) - 1
         if len(filter_list) > 1:
             filter_list.pop()
+        return nr
 
     @classmethod
     def rollback_all(cls):
         singleton_instance = SingletonClass()
         list_key = singleton_instance.selected + '_filter_list'
         filter_list = cls.__load(list_key)
+        nr = len(filter_list) - 1
         while len(filter_list) > 1:
             filter_list.pop()
+        return nr
 
     def clear(self):
         if os.path.exists("data/uploads"):
