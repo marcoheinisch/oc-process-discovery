@@ -61,7 +61,7 @@ To use this feature, you have to set the connection parameters and credentials f
 ### Extraction from SQLite
 A SQLite with sample data is included in this repository. To use your data, you have to provide an own SQLite database.
 
-An example script for creating a SQLite Database the tool can process is given here: [utils/save_tables.py](https://github.com/marcoheinisch/oc-process-discovery/blob/feature/manual/utils/save_tables_sqlite.py). 
+An example script for creating a SQLite Database the tool can process is given here: [utils/save_tables_sqlite.py](https://github.com/marcoheinisch/oc-process-discovery/blob/feature/manual/utils/save_tables_sqlite.py). 
 
 Replace the `sap_tables.sqlite` or, if you use Docker, mount a SQLite volume as described in the section Setup. Subsequently, follow these steps:
 
