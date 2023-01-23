@@ -28,24 +28,24 @@ This project runs on Python 3.9.13
 3. Install dependencies with `pip install -r requirements.txt --use-deprecated=legacy-resolver `.
 4. add /environment/.env file with content from .env.development.
 5. Run project / index.py
-   1. in vs code: use the configuration stored in launch.json file
-   2. in pycharm: use the configuration stored in .idea/runConfigurations/oc_process_discovery.xml file
+   1. in VS Code: use the configuration stored in launch.json file
+   2. in PyCharm: use the configuration stored in .idea/runConfigurations/oc_process_discovery.xml file
 
 ## Docker setup
-Note: Because SAPnwRFC is Platform-dependent and can't be shared in this repository due to licensing. Furthermore, extraction directly from SAP systems is yet not possible if you use Docker.
 
 1. Check if pyrfc is commented out in requiremnts.txt
 2. Build docker image: `docker build -t ocpaapp`
 3. Run image: `docker run --name ocpa -p 8084:8085 ocpaapp`
 
+Note: Because SAPnwRFC is Platform-dependent and can't be shared in this repository due to licensing reasons, it is not included in the docker image. Therefore, extraction directly from SAP systems is yet not possible if you use Docker.
 
 # Usage
 ## Overview (Jean)
 
 ## OCEL Extraction
-You can use this tool to extract a OCEL containing O2C related events from SAP 4/hana. Alternative from that, you can extract from a SQLite database containing the required SAP tables.
+You can use this tool to extract an OCEL containing O2C related events from SAP S/4HANA. Alternative from that, you can extract from a SQLite database containing the required SAP tables.
 
-Our tool queries the tables *VBFA*, *VBAK* as well as *BSAD*, *CDHDR* and *CDPOS*. From these tables, information about SAP-table-documents that are related to the Order-To-Cash process (e.g. Inquiry, Order, ....) are extracted and used to generate an OCEL. 
+Our tool queries the tables *VBFA*, *VBAK* as well as *BSAD*, *CDHDR* and *CDPOS*. From these tables, information about SAP-table-documents that are related to the Order-To-Cash process (e.g., Inquiry, Order, …) are extracted and used to generate an OCEL. 
 
 In the app, all configurable parameters and settings related to the extraction are placed in a configuration popup:
 
@@ -63,24 +63,24 @@ A SQLite with sample data is included in this repository. To use your data, you 
 
 An example script for creating a SQLite Database the tool can process is given here: [utils/save_tables.py](https://github.com/marcoheinisch/oc-process-discovery/blob/feature/manual/utils/save_tables_sqlite.py). 
 
-Replace the `sap_tables.sqlite` or if you use Docker, mount a SQLite volume as described in the section Setup. After that, follow these steps:
+Replace the `sap_tables.sqlite` or, if you use Docker, mount a SQLite volume as described in the section Setup. Subsequently, follow these steps:
 
 1. In data-view, click on `CONFIG`
 2. Select `Use SQLite 3 database instead SAP` (6)
 3. Close the Popup and start Extraction.
 
 ### Change prefilter: date range
-Currently we only prefilter event information by a date range which is configurable in the Configuration Popup:
+Currently, we only prefilter event information by a date range, which is configurable in the Configuration Popup:
 
 1. In data-view, click on `CONFIG`
 2. In the popup: Type the new values in the date fields (4) and click save (5).
 
 ## Dataset management
-In the data management page, you are given the possibility to either extract logs as discribed, download or to upload them from your local file system:
+In the data management page, you are given the possibility to either extract logs as described, download or to upload them from your local file system:
 
 <img src="assets/images/dms_all.PNG" alt="Configuration Popup" style="max-width: 600px;"/>
 
-If, instead of uploading logs from the SAP, you want to upload them from your own local file system, simply click on the button `Upload .jsonocel files`. Your local file system should then pop up, enabling you to upload any desired file. Please note, however, that only .jsonocel files are accepted.
+If, instead of uploading logs from the SAP, you want to upload them from your local file system, simply click on the button `Upload .jsonocel files`. Your local file system should then pop up, enabling you to upload any desired file. Please note, however, that only *.jsonocel* files are accepted.
 
 All your extracted and/or uploaded files should be visible in the section "View and select file for analysis". There, you will have not only the possibility of selecting specific files to be deleted, but also to be downloaded. All files will then be ready to be filtered, as we will see now thoroughly in the next section.
 
