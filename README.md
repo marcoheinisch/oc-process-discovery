@@ -22,18 +22,20 @@ A process discovery tool working on object-centric event logs extracted from SAP
       - [Buttons](#buttons)
       - [Statistics and log preview](#statistics-and-log-preview)
   - [Analysis](#analysis)
-  - [Troubleshooting \& FAQ](#troubleshooting--faq)
+    - [Options](#options)
+  - [Troubleshooting and FAQ](#troubleshooting-and-faq)
 - [Further information](#further-information)
 
 # Setup
 ## Python setup
-This project runs on Python 3.9.13
+This project is developed in Python 3.9.13 and additionaly requires graphviz. 
 
-1. Create virtual environment. For example, with `python -m venv venv`.
-2. Activate virtual environment. For example, with `source venv/bin/activate` or `venv\Scripts\activate.ps1`.
-3. Install dependencies with `pip install -r requirements.txt --use-deprecated=legacy-resolver `.
-4. add /environment/.env file with content from .env.development.
-5. Run project / index.py
+1. Download and install [graphviz](https://graphviz.org/download/).
+2. Create virtual environment. For example, with `python -m venv venv`.
+3. Activate virtual environment. For example, with `source venv/bin/activate` or `venv\Scripts\activate.ps1`.
+4. Install dependencies with `pip install -r requirements.txt --use-deprecated=legacy-resolver `.
+5. add /environment/.env file with content from .env.development.
+6. Run project / index.py
    1. in VS Code: use the configuration stored in launch.json file
    2. in PyCharm: use the configuration stored in .idea/runConfigurations/oc_process_discovery.xml file
 
@@ -51,17 +53,15 @@ This tool consists of 3 pages. Switch pages by clicking on 1, 2 or 3 on the left
 
 <img src="assets/images/Overview-Sidebar.png" style="width: 200px;"/>
 
-(1): Home; here you can read the user manual, that assists you using our tool.
-
-(2): Data; here is your data management, where you can for example extract, upload, download, delete and filter your files.
-
-(3): Analyse; here you will see your results as a graph. You can also choose your process discovery algorithms.
+- (1) Home: here you can read the user manual, that assists you using our tool.
+- (2) Data: here is your data management, where you can for example extract, upload, download, delete and filter your files.
+- (3) Analyse: here you will see your results as a graph. You can also choose your process discovery algorithms.
 
 
 ## OCEL Extraction
 You can use this tool to extract an OCEL containing O2C related events from SAP S/4HANA. Alternative from that, you can extract from a SQLite database containing the required SAP tables.
 
-Our tool queries the tables *VBFA*, *VBAK* as well as *BSAD*, *CDHDR* and *CDPOS*. From these tables, information about SAP-table-documents that are related to the Order-To-Cash process (e.g., Inquiry, Order, …) are extracted and used to generate an OCEL. 
+Our tool queries the tables *VBFA*, *VBAK* as well as *BSAD*, *CDHDR* and *CDPOS*. From these tables, information about SAP-table-documents that are related to the Order-To-Cash process (e.g., Inquiry, Order, ...) are extracted and used to generate an OCEL. 
 
 In the app, all configurable parameters and settings related to the extraction are placed in a configuration popup:
 
@@ -168,17 +168,28 @@ To the right of the data management and filtering segments you can see some stat
 
 ## Analysis
 Now you can analyse your processes.
+
 <img src="assets/images/Analyse.png" style="max-width: 600px;"/>
-The page is divided into (1) - graph section - where you can see your resulting graph and (2) - options section - where you can choose your process discovery algorithm.
+
+The page is divided into 
+- (1) - graph section - where you can see your resulting graph and 
+- (2) - options section - where you can choose your process discovery algorithm.
+
 In (1) you can zoom in, zoom out by scrolling with your mouse. By clicking on section (1) and moving your mouse, you can move your graph. 
+
 <img src="assets/images/analyse-help.png" style="max-width: 600px;"/>
+
 Get more overview by clicking on (a) and (b), center the graph by clicking on (c).
+
+### Options
+
 <img src="assets/images/analyse-algorithms.png" style="max-width: 600px;"/>
+
 Directly Follows Graph (dfg) is the default algorithm. (In the option section) Click on it, as displayed on the left side, to change it.
 You can choose between Petri Net (ocpa) and Petri Net (pm4py). Your current process discovery algorithm is **bold**. Your graph will change immediately after choosing another algorithm.
 If you want to change your file, simply press "GO BACK TO DMS".
 
-## Troubleshooting & FAQ
+## Troubleshooting and FAQ
 * One of the algorithms, pm4py, runs into a KeyError if the user filters out all event attributes except for one. This seems to have to do with the internal implementation of pm4py which doesn't consider border cases after filtering has been applied/doesn't update its knowledge base. In this case, please use one of the two remaining algorithms.
 * Pm4py also presupposes that default values be defined for ocel:global-event and ocel:global-object in your log. Therefore, you may get a respective KeyError if you upload the log yourself and do not use the extraction function. You can use one of the other algorithms or add the following lines to your log file to remedy this:
     ```
