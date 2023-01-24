@@ -94,7 +94,7 @@ Currently, we only prefilter event information by a date range, which is configu
 ## Dataset management
 In the data management page, you are given the possibility to either extract logs as described, download or to upload them from your local file system:
 
-<img src="assets/images/dms/dms_page.png" alt="Image of the data management page" style="width: 600px"/>
+<img src="assets/images/dms/dms_page.png" alt="Image of the data management page" style="max-width: 600px;"/>
 
 If, instead of uploading logs from the SAP, you want to upload them from your local file system, simply click on the button `Upload .jsonocel files`. Your local file system should then pop up, enabling you to upload any desired file. Please note, however, that only *.jsonocel* files are accepted.
 
@@ -142,9 +142,9 @@ Example of a successful filtering: in the first picture you can see the chosen f
 
 Below, in the second picture, is the result log.
 
-<img src="assets/images/filtering/before.png" alt="Before filtering" style="width: 600px"/>
+<img src="assets/images/filtering/before.png" alt="Before filtering" style="max-width: 600px;"/>
 
-<img src="assets/images/filtering/after.png" alt="After filtering" style="width: 600px"/>
+<img src="assets/images/filtering/after.png" alt="After filtering" style="max-width: 600px;"/>
 
 #### Buttons
 To understand how the buttons work, one first needs to account for the mechanics behind filtering in this application and how it is interconnected with the data management system.
@@ -161,19 +161,19 @@ There are also two navigation buttons on the data and analysis pages: **Go to an
 
 Below the buttons there is a minimalistic message board that will keep the status of your last action. For example, after pressing the **Rollback all** button:
 
-<img src="assets/images/message_board.png" alt="Image of the data management page" style="width: 300px"/>
+<img src="assets/images/message_board.png" alt="Image of the data management page" style="max-width: 300px;"/>
 
 #### Statistics and log preview
 To the right of the data management and filtering segments you can see some statistics of your event log followed by its real-time preview. The neat part: the preview is always up to date with the most recent state of the selected log. As a result, you will be able to observe the changes live, compare different logs and, in general, make more well-informed decisions regarding your next steps.
 
 ## Analysis
 Now you can analyse your processes.
-<img src="assets/images/Analyse.png" style="width: 600px"/>
+<img src="assets/images/Analyse.png" style="max-width: 600px;"/>
 The page is divided into (1) - graph section - where you can see your resulting graph and (2) - options section - where you can choose your process discovery algorithm.
 In (1) you can zoom in, zoom out by scrolling with your mouse. By clicking on section (1) and moving your mouse, you can move your graph. 
-<img src="assets/images/analyse-help.png" style="width: 600px"/>
+<img src="assets/images/analyse-help.png" style="max-width: 600px;"/>
 Get more overview by clicking on (a) and (b), center the graph by clicking on (c).
-<img src="assets/images/analyse-algorithms.png" style="width: 600px"/>
+<img src="assets/images/analyse-algorithms.png" style="max-width: 600px;"/>
 Directly Follows Graph (dfg) is the default algorithm. (In the option section) Click on it, as displayed on the left side, to change it.
 You can choose between Petri Net (ocpa) and Petri Net (pm4py). Your current process discovery algorithm is **bold**. Your graph will change immediately after choosing another algorithm.
 If you want to change your file, simply press "GO BACK TO DMS".
