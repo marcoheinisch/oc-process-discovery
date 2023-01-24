@@ -8,3 +8,20 @@
 .modal-content{
   padding: 1rem;
 }
+
+::-webkit-scrollbar {
+  width: 0.8rem; 
+  border-radius: 1rem; 
+  background-color: transparent; 
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 1rem; 
+  border-width: 1rem; 
+  border-style: solid; 
+  border-color: transparent; 
+  background-color: rgb( 161, 153, 153); 
+}
+
+
+
