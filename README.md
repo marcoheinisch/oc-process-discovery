@@ -70,7 +70,7 @@ Our tool queries the tables *VBFA*, *VBAK* as well as *BSAD*, *CDHDR* and *CDPOS
 
 In the app, all configurable parameters and settings related to the extraction are placed in a configuration popup:
 
-<img src="assets/images/extraction_config_marked.PNG" alt="Configuration Popup" style="max-width: 50em;"/>
+<img src="assets/images/extraction_config_marked.png" alt="Configuration Popup" style="max-width: 50em;"/>
 
 ### Extraction from SAP Cloud
 To use this feature, you have to set the connection parameters and credentials for your SAP instance. You can either set these in the `.env` file before start, or change these in the Configuration Popup:
