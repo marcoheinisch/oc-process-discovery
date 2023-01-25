@@ -26,11 +26,6 @@ A process discovery tool working on object-centric event logs extracted from SAP
   - [Troubleshooting and FAQ](#troubleshooting-and-faq)
 - [Further information](#further-information)
 
-
-<br>
-
-<br>
-
 # Quick setup
 ## Python setup
 This project is developed in Python 3.9.13 and additionaly requires graphviz. 
