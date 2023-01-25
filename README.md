@@ -65,7 +65,7 @@ Our tool queries the tables *VBFA*, *VBAK* as well as *BSAD*, *CDHDR* and *CDPOS
 
 In the app, all configurable parameters and settings related to the extraction are placed in a configuration popup:
 
-<img src="assets/images/extraction_config.PNG" alt="Configuration Popup" style="max-width: 600px;"/>
+<img src="assets/images/extraction_config.PNG" alt="Configuration Popup" style="max-width: 50%;"/>
 
 ### Extraction from SAP Cloud
 To use this feature, you have to set the connection parameters and credentials for your SAP instance. You can either set these in the `.env` file before start, or change these in the Configuration Popup:
@@ -94,7 +94,7 @@ Currently, we only prefilter event information by a date range, which is configu
 ## Dataset management
 In the data management page, you are given the possibility to either extract logs as described, download or to upload them from your local file system:
 
-<img src="assets/images/dms/dms_page.png" alt="Image of the data management page" style="max-width: 600px;"/>
+<img src="assets/images/dms/dms_page.png" alt="Image of the data management page" style="max-width: 60em;"/>
 
 If, instead of uploading logs from the SAP, you want to upload them from your local file system, simply click on the button `Upload .jsonocel files`. Your local file system should then pop up, enabling you to upload any desired file. Please note, however, that only *.jsonocel* files are accepted.
 
@@ -142,9 +142,9 @@ Example of a successful filtering: in the first picture you can see the chosen f
 
 Below, in the second picture, is the result log.
 
-<img src="assets/images/filtering/before.png" alt="Before filtering" style="max-width: 600px;"/>
+<img src="assets/images/filtering/before.png" alt="Before filtering" style="max-width: 800px;"/>
 
-<img src="assets/images/filtering/after.png" alt="After filtering" style="max-width: 600px;"/>
+<img src="assets/images/filtering/after.png" alt="After filtering" style="max-width: 60rem;"/>
 
 #### Buttons
 To understand how the buttons work, one first needs to account for the mechanics behind filtering in this application and how it is interconnected with the data management system.
