@@ -47,8 +47,9 @@ This project is developed in Python 3.9.13 and additionaly requires graphviz.
 ## Docker setup
 
 1. Check if pyrfc is commented out in requiremnts.txt
-2. Build docker image: `docker build -t ocpaapp`
-3. Run image: `docker run --name ocpa -p 8084:8085 ocpaapp`
+2. Build docker image: `docker build -t ocpaapp .`
+3. Run image: `docker run -p 8085:8085 ocpdapp `
+   - Or if you want to [use your own SQLite database](#extraction-from-sqlite), mount a volume to the container: `docker run -p 8085:8085 -v C:\path\to\sqlitrefolder:/sqlite ocpdapp `
 
 Note: Because SAPnwRFC is Platform-dependent and can't be shared in this repository due to licensing reasons, it is not included in the docker image. Therefore, extraction directly from SAP systems is yet not possible if you use Docker.
 
