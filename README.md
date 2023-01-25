@@ -98,7 +98,7 @@ In the data management page, you are given the possibility to either extract log
 
 If, instead of uploading logs from the SAP, you want to upload them from your local file system, simply click on the button `Upload .jsonocel files`. Your local file system should then pop up, enabling you to upload any desired file. Please note, however, that only *.jsonocel* files are accepted.
 
-All your extracted and/or uploaded files should be visible in the section "View and select file for analysis". There, you will have not only the possibility of selecting specific files to be deleted, but also to be downloaded. All files will then be ready to be filtered, as we will see now thoroughly in the next section.
+All your extracted and/or uploaded files should be visible in the section "`View and select file for analysis`". There, you will have not only the possibility of selecting specific files to be deleted, but also to be downloaded. All files will then be ready to be filtered, as we will see now thoroughly in the next section.
 
 ### Filtering datasets
 On the same [data management page](dms) you can find a Filtering segment that presents you with an opportunity to refine your data based on the preliminary analysis results. That way, you can observe how your process models change in relation to minor modifications in the underlying data and draw conclusions accordingly. Our UI offers some tools and options that will make your work more productive and comprehensive:
@@ -106,9 +106,9 @@ On the same [data management page](dms) you can find a Filtering segment that pr
 <img src="assets/images/filter_overview.png" alt="Image of the data management page" style="max-width: 50em;"/>
 
 #### Filter on Event Attributes (1)
-1. Choose the event attribute that you want to filter by, e.g. *ocel:activity*
+1. Choose the event attribute that you want to filter by, e.g. *`ocel:activity`*
 2. Pick a *list of values* for that attribute from the dropdown that appears after that.
-3. *Positive/Negative* - here you have to decide whether you want to leave the values chosen in the data (Positive) or their complement (Negative). Negative is chosen as default.
+3. *`Positive`/`Negative`* - here you have to decide whether you want to leave the values chosen in the data (Positive) or their complement (Negative). Negative is chosen as default.
 
 Example from the backend:
 ```
@@ -118,9 +118,9 @@ filtered_ocel = pm4py.filter_ocel_event_attribute(ocel, "ocel:activity", ["Item 
 #### Filter on Object Attributes (2)
 Similarly to Filter on Event Attributes, for the next type of filtering you need to:
 
-1. Choose the object attribute that you want to filter by, e.g. *ocel:type*
+1. Choose the object attribute that you want to filter by, e.g. *`ocel:type`*
 2. Pick a *list of values* for that attribute from the dropdown that appears after that.
-3. Set the *Positive/Negative* flag (Negative as default)
+3. Set the *`Positive`/`Negative`* flag (Negative as default)
 
 Example from the backend:
 ```
@@ -158,18 +158,18 @@ To understand how the buttons work, one first needs to account for the mechanics
 
 <img src="assets/images/message_board.png" alt="Image of the data management page" style="max-width: 30em;"/>
 
-- First of all, filtering is carried out discretely (in steps) by pressing the **Filter** button. Every step may consist of one or more filtering options being used: this is done to make your work more efficient. If it makes sense to keep a couple of different filtering substeps part of the same logical step, you are more then welcome to apply more then one filter at the same time. 
-- If you follow this path, it will be easier to go back in time using the **Rollback** button. Rollback reverts to the state of the data before the last filtering step was applied (so, basically, before you pressed the Filter button). 
-- Sometimes, you may want to decide to abandon your changes to the data completely even after going through multiple filtering steps. This can be done using the **Rollback all** button. It gives you the guarantee of going back to the original state of the selected file.
-- Together with the next button, **Save all**, the rollbacks enable you to version-control your datasets. After a given number of filtering steps, you can save your changes into a new file (with a name having a "_filtered" suffix). The original branch is then reset to the state before filtering. This functionality can also be used to copy files (after zero steps). Subsequently, the newly created file is automatically selected and so any next step will be applied to the old and not to the new file. 
+- First of all, filtering is carried out discretely (in steps) by pressing the **`Filter`** button. Every step may consist of one or more filtering options being used: this is done to make your work more efficient. If it makes sense to keep a couple of different filtering substeps part of the same logical step, you are more then welcome to apply more then one filter at the same time. 
+- If you follow this path, it will be easier to go back in time using the **`Rollback`** button. Rollback reverts to the state of the data before the last filtering step was applied (so, basically, before you pressed the Filter button). 
+- Sometimes, you may want to decide to abandon your changes to the data completely even after going through multiple filtering steps. This can be done using the **`Rollback all`** button. It gives you the guarantee of going back to the original state of the selected file.
+- Together with the next button, **`Save all`**, the rollbacks enable you to version-control your datasets. After a given number of filtering steps, you can save your changes into a new file (with a name having a "_filtered" suffix). The original branch is then reset to the state before filtering. This functionality can also be used to copy files (after zero steps). Subsequently, the newly created file is automatically selected and so any next step will be applied to the old and not to the new file. 
   * Be careful: all intermediate states are deleted after saving changes to a new file. This means that rollback does not work on the new file anymore (or on the old one, since its state is reset too).
   * Don't worry about the filename resolution too much. If a filename is already in use, we will definitely find a free one!
   * You DO NOT have to save changes if you want to download the event log in its current form.
-- Finally, **Clear all** is the Big Reset option that will come in handy once you want to move to a new task or start again from scratch. It will delete all files together with their intermediate states and replace them with a singular example event-log. It can thus be understood as a cache-cleaning tool and is also invoked on start-up of the application, preventing memory leaks and making sure it will not get cluttered after longer use. The user should consider either rebooting or pressing that button from time to time (given that they can export their more well-baked event logs and import them in a new instance anyway) instead of running the same instance indefinitely.
+- Finally, **`Clear all`** is the Big Reset option that will come in handy once you want to move to a new task or start again from scratch. It will delete all files together with their intermediate states and replace them with a singular example event-log. It can thus be understood as a cache-cleaning tool and is also invoked on start-up of the application, preventing memory leaks and making sure it will not get cluttered after longer use. The user should consider either rebooting or pressing that button from time to time (given that they can export their more well-baked event logs and import them in a new instance anyway) instead of running the same instance indefinitely.
 
-There are also two navigation buttons on the data and analysis pages: **Go to analysis** and **Go to dms**. To press any of them is equivalent to choosing the respective page from the sidebar to the left. They serve the sole purpose of cutting down distance from one click to the next.
+There are also two navigation buttons on the data and analysis pages: **`Go to analysis`** and **`Go to dms`**. To press any of them is equivalent to choosing the respective page from the sidebar to the left. They serve the sole purpose of cutting down distance from one click to the next.
 
-Below the buttons there is a minimalistic message board that will keep the status of your last action. For example, after pressing the **Rollback all** button.
+Below the buttons there is a minimalistic message board that will keep the status of your last action. For example, after pressing the **`Rollback all`** button.
 
 #### Statistics and log preview
 To the right of the data management and filtering segments you can see some statistics of your event log followed by its real-time preview. The neat part: the preview is always up to date with the most recent state of the selected log. As a result, you will be able to observe the changes live, compare different logs and, in general, make more well-informed decisions regarding your next steps.
@@ -204,7 +204,7 @@ If you want to change your file, simply press "GO BACK TO DMS".
       "ocel:global-event": "default",
       "ocel:global-object": "default",
     ```
-* If you press **Download** without pressing **Save all** first, you will download the most recent state (after filtering) of the event log to be sure but bear in mind that the old file will still preserve changes done to it. That means: if you upload that file again, the two event logs will be the same. Although that is the desired behavior, it differs from when you would just save the changes: then, the old file would be reset and the new one would preserve the changes.
+* If you press **`Download`** without pressing **`Save all`** first, you will download the most recent state (after filtering) of the event log to be sure but bear in mind that the old file will still preserve changes done to it. That means: if you upload that file again, the two event logs will be the same. Although that is the desired behavior, it differs from when you would just save the changes: then, the old file would be reset and the new one would preserve the changes.
 * The error "No events to process." is shown when no events are found in the log. This can happen when the prefilter is set to a date range that does not contain any events. To fix this, change the prefilter in the configuration popup.
 * If you get an error like "No module named 'sapnwrfc'", you have to install the SAP NetWeaver RFC SDK to extract directly from SAP. 
 
