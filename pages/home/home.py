@@ -35,7 +35,7 @@ layout = html.Div([
         dedent = False,
         dangerously_allow_html = True,
         id = 'markdown-content',
-        style = {'max-width': '600px'}
+        style = {'max-width': ' 50em'}
     )])
 
 

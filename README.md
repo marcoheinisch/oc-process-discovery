@@ -1,10 +1,10 @@
-# OC-Process-Discovery
+# Oc-Process-Discovery
 A process discovery tool working on object-centric event logs extracted from SAP ERP. It was developed in the "Process Discovery Using Python" lab at RWTH. 
 
 # Table of Contents
-- [OC-Process-Discovery](#oc-process-discovery)
+- [Oc-Process-Discovery](#oc-process-discovery)
 - [Table of Contents](#table-of-contents)
-- [Setup](#setup)
+- [Quick setup](#quick-setup)
   - [Python setup](#python-setup)
   - [Docker setup](#docker-setup)
 - [Usage](#usage)
@@ -15,9 +15,9 @@ A process discovery tool working on object-centric event logs extracted from SAP
     - [Change prefilter: date range](#change-prefilter-date-range)
   - [Dataset management](#dataset-management)
     - [Filtering datasets](#filtering-datasets)
-      - [Filter on Event Attributes](#filter-on-event-attributes)
-      - [Filter on Object Attributes](#filter-on-object-attributes)
-      - [Filter on Event Timestamp](#filter-on-event-timestamp)
+      - [Filter on Event Attributes (1)](#filter-on-event-attributes-1)
+      - [Filter on Object Attributes (2)](#filter-on-object-attributes-2)
+      - [Filter on Event Timestamp (3)](#filter-on-event-timestamp-3)
       - [All three filters combined: an example](#all-three-filters-combined-an-example)
       - [Buttons](#buttons)
       - [Statistics and log preview](#statistics-and-log-preview)
@@ -26,7 +26,7 @@ A process discovery tool working on object-centric event logs extracted from SAP
   - [Troubleshooting and FAQ](#troubleshooting-and-faq)
 - [Further information](#further-information)
 
-# Setup
+# Quick setup
 ## Python setup
 This project is developed in Python 3.9.13 and additionaly requires graphviz. 
 
@@ -49,9 +49,9 @@ Note: Because SAPnwRFC is Platform-dependent and can't be shared in this reposit
 
 # Usage
 ## Overview
-This tool consists of 3 pages. Switch pages by clicking on 1, 2 or 3 on the left side bar.
+This tool consists of 3 pages. Switch pages by clicking on 1, 2 or 3 on the left side bar:
 
-<img src="assets/images/Overview-Sidebar.png" style="width: 200px;"/>
+<img src="assets/images/Overview-Sidebar-no-title.png" style="width: 20em;"/>
 
 - (1) Home: here you can read the user manual, that assists you using our tool.
 - (2) Data: here is your data management, where you can for example extract, upload, download, delete and filter your files.
@@ -65,13 +65,13 @@ Our tool queries the tables *VBFA*, *VBAK* as well as *BSAD*, *CDHDR* and *CDPOS
 
 In the app, all configurable parameters and settings related to the extraction are placed in a configuration popup:
 
-<img src="assets/images/extraction_config.PNG" alt="Configuration Popup" style="max-width: 50%;"/>
+<img src="assets/images/extraction_config_marked.PNG" alt="Configuration Popup" style="max-width: 50em;"/>
 
 ### Extraction from SAP Cloud
 To use this feature, you have to set the connection parameters and credentials for your SAP instance. You can either set these in the `.env` file before start, or change these in the Configuration Popup:
 
 1. In data-view, click on `CONFIG`
-2. In the popup: Select the parameter you want to change in the dropdown (3) type the new value (4) and click save (5).
+2. In the popup: Select the parameter you want to change in the dropdown (1) type the new value (2) and click save (3).
 3. Make sure your device is allowed to connect with SAP. After everything is set, close the Popup and start Extraction.
 
 ### Extraction from SQLite
@@ -82,19 +82,19 @@ An example script for creating a SQLite Database the tool can process is given h
 Replace the `sap_tables.sqlite` or, if you use Docker, mount a SQLite volume as described in the section Setup. Subsequently, follow these steps:
 
 1. In data-view, click on `CONFIG`
-2. Select `Use SQLite 3 database instead SAP` (6)
+2. Select `Use SQLite 3 database instead SAP` (5)
 3. Close the Popup and start Extraction.
 
 ### Change prefilter: date range
 Currently, we only prefilter event information by a date range, which is configurable in the Configuration Popup:
 
 1. In data-view, click on `CONFIG`
-2. In the popup: Type the new values in the date fields (4) and click save (5).
+2. In the popup: Type the new values in the date fields (4) and click close (6).
 
 ## Dataset management
 In the data management page, you are given the possibility to either extract logs as described, download or to upload them from your local file system:
 
-<img src="assets/images/dms/dms_page.png" alt="Image of the data management page" style="max-width: 60em;"/>
+<img src="assets/images/dms/dms_page_marked.png" alt="Image of the data management page" style="max-width: 50em;"/>
 
 If, instead of uploading logs from the SAP, you want to upload them from your local file system, simply click on the button `Upload .jsonocel files`. Your local file system should then pop up, enabling you to upload any desired file. Please note, however, that only *.jsonocel* files are accepted.
 
@@ -103,7 +103,9 @@ All your extracted and/or uploaded files should be visible in the section "View 
 ### Filtering datasets
 On the same [data management page](dms) you can find a Filtering segment that presents you with an opportunity to refine your data based on the preliminary analysis results. That way, you can observe how your process models change in relation to minor modifications in the underlying data and draw conclusions accordingly. Our UI offers some tools and options that will make your work more productive and comprehensive:
 
-#### Filter on Event Attributes
+<img src="assets/images/filter_overview.png" alt="Image of the data management page" style="max-width: 50em;"/>
+
+#### Filter on Event Attributes (1)
 1. Choose the event attribute that you want to filter by, e.g. *ocel:activity*
 2. Pick a *list of values* for that attribute from the dropdown that appears after that.
 3. *Positive/Negative* - here you have to decide whether you want to leave the values chosen in the data (Positive) or their complement (Negative). Negative is chosen as default.
@@ -113,7 +115,7 @@ Example from the backend:
 filtered_ocel = pm4py.filter_ocel_event_attribute(ocel, "ocel:activity", ["Item out of stock", "Fuel Car", "Reorder Item"], positive=False)
 ```
 
-#### Filter on Object Attributes
+#### Filter on Object Attributes (2)
 Similarly to Filter on Event Attributes, for the next type of filtering you need to:
 
 1. Choose the object attribute that you want to filter by, e.g. *ocel:type*
@@ -125,7 +127,7 @@ Example from the backend:
 filtered_ocel = pm4py.filter_ocel_object_attribute(ocel, "ocel:type", ["order", "delivery"], positive=True)
 ```
 
-#### Filter on Event Timestamp
+#### Filter on Event Timestamp (3)
 By picking a *start date* and an *end date* you can restrict your event log to the chosen time interval. This can prove a useful functionality when confronted with a process that may fluctuate over time, e.g. as a result of a varying strain on the process, introduction of new events, change in procedures, etc. The user should not worry about picking an invalid time interval - the boundaries are already set based on the log in consideration.
 
 Example from the backend:
@@ -142,12 +144,20 @@ Example of a successful filtering: in the first picture you can see the chosen f
 
 Below, in the second picture, is the result log.
 
-<img src="assets/images/filtering/before.png" alt="Before filtering" style="max-width: 800px;"/>
+Before:
 
-<img src="assets/images/filtering/after.png" alt="After filtering" style="max-width: 60rem;"/>
+<img src="assets/images/filtering/before.png" alt="Before filtering" style="max-width: 50em;"/>
+
+After:
+
+<img src="assets/images/filtering/after.png" alt="After filtering" style="max-width: 50em;"/>
 
 #### Buttons
+
 To understand how the buttons work, one first needs to account for the mechanics behind filtering in this application and how it is interconnected with the data management system.
+
+<img src="assets/images/message_board.png" alt="Image of the data management page" style="max-width: 30em;"/>
+
 - First of all, filtering is carried out discretely (in steps) by pressing the **Filter** button. Every step may consist of one or more filtering options being used: this is done to make your work more efficient. If it makes sense to keep a couple of different filtering substeps part of the same logical step, you are more then welcome to apply more then one filter at the same time. 
 - If you follow this path, it will be easier to go back in time using the **Rollback** button. Rollback reverts to the state of the data before the last filtering step was applied (so, basically, before you pressed the Filter button). 
 - Sometimes, you may want to decide to abandon your changes to the data completely even after going through multiple filtering steps. This can be done using the **Rollback all** button. It gives you the guarantee of going back to the original state of the selected file.
@@ -159,9 +169,7 @@ To understand how the buttons work, one first needs to account for the mechanics
 
 There are also two navigation buttons on the data and analysis pages: **Go to analysis** and **Go to dms**. To press any of them is equivalent to choosing the respective page from the sidebar to the left. They serve the sole purpose of cutting down distance from one click to the next.
 
-Below the buttons there is a minimalistic message board that will keep the status of your last action. For example, after pressing the **Rollback all** button:
-
-<img src="assets/images/message_board.png" alt="Image of the data management page" style="max-width: 300px;"/>
+Below the buttons there is a minimalistic message board that will keep the status of your last action. For example, after pressing the **Rollback all** button.
 
 #### Statistics and log preview
 To the right of the data management and filtering segments you can see some statistics of your event log followed by its real-time preview. The neat part: the preview is always up to date with the most recent state of the selected log. As a result, you will be able to observe the changes live, compare different logs and, in general, make more well-informed decisions regarding your next steps.
@@ -169,7 +177,7 @@ To the right of the data management and filtering segments you can see some stat
 ## Analysis
 Now you can analyse your processes.
 
-<img src="assets/images/Analyse.png" style="max-width: 600px;"/>
+<img src="assets/images/Analyse.png" style="max-width: 50em;"/>
 
 The page is divided into 
 - (1) - graph section - where you can see your resulting graph and 
@@ -177,13 +185,13 @@ The page is divided into
 
 In (1) you can zoom in, zoom out by scrolling with your mouse. By clicking on section (1) and moving your mouse, you can move your graph. 
 
-<img src="assets/images/analyse-help.png" style="max-width: 600px;"/>
+<img src="assets/images/analyse-help.png" style="max-width: 50em;"/>
 
 Get more overview by clicking on (a) and (b), center the graph by clicking on (c).
 
 ### Options
 
-<img src="assets/images/analyse-algorithms.png" style="max-width: 600px;"/>
+<img src="assets/images/analyse-algorithms.png" style="max-width: 50em;"/>
 
 Directly Follows Graph (dfg) is the default algorithm. (In the option section) Click on it, as displayed on the left side, to change it.
 You can choose between Petri Net (ocpa) and Petri Net (pm4py). Your current process discovery algorithm is **bold**. Your graph will change immediately after choosing another algorithm.
