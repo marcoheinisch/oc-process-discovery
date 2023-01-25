@@ -145,7 +145,8 @@ layout = html.Div([
             ),
             html.Hr(),
             dash_table.DataTable(
-                id='log-statistics-table'
+                id='log-statistics-table',
+                style_table={'overflowX': 'auto'},
             ),
         ],
         style=
