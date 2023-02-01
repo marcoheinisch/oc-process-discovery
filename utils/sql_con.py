@@ -1,8 +1,11 @@
 import sqlite3
 import pandas as pd
 
-class SqlLiteConnection():
-    db_path = "sap_tables.sqlite"
+from utils.constants import SQLITE_PATH
+
+
+class SqlLiteConnection:
+    db_path = SQLITE_PATH
     conn = None    
     
     def push_tables(self, tables: dict) -> None:

@@ -2,6 +2,33 @@ body {
     font-family: sans-serif;
 }
 
+#markdown-content h1{
+    margin-top: 2rem;
+    font-size: 3.0rem;
+}
+#markdown-content h2{
+    color: rgb(96, 96, 96) !important;
+    font-size: 2.7rem;
+}
+#markdown-content h3{
+    color: rgb(96, 96, 96) !important;
+    font-size: 2.3rem;
+}
+#markdown-content h4{
+    color: rgb(96, 96, 96) !important;
+    font-size: 2rem;
+}
+
 h1, h2, h3, h4, h5, h6 {
     color: hotpink
+}
+
+img[src*="#thumbnail"] {
+   width:150px;
+   height:100px;
+}
+
+#markdown-content li, #markdown-content li ul {
+	margin-bottom: 0rem;
+	margin-top: 0rem;
 }

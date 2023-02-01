@@ -11,6 +11,7 @@ TIMEOUT = 60
 
 # Path of the local database.
 sqlite_path = 'data/internal_sqlite.db'
+SQLITE_PATH = "sqlite/sap_tables.sqlite"
 
 # Number of rows that are downloaded in each call by the NWRFC library.
 ROWS_AT_A_TIME = 3000

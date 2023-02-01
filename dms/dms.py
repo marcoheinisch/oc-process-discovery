@@ -2,6 +2,7 @@ import os
 import base64
 from pm4py.objects.ocel.obj import OCEL
 import pm4py
+from datetime import date
 
 from utils.constants import UPLOAD_DIRECTORY
 import shutil
@@ -33,6 +34,10 @@ class DataManagementSystem:
         'client': '',
         'lang': '',
         'trace': ''
+    }
+    extraction_config = {
+        "from_date": date(2020, 1, 1),
+        "to_date": date.today(),
     }
     use_sqlite = False
     
