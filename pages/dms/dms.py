@@ -327,7 +327,7 @@ def set_statistics(value1, value2):
 
     df = df.applymap(flatten_lists)
     columns = [{'name': col, 'id': col} for col in df.columns]
-    print(df)
-    print(df.to_dict('records')[0])
+    #print(df)
+    #print(df.to_dict('records')[0])
     message = str(ocel).replace("Please use <THIS>.get_extended_table() to get a dataframe representation of the events related to the objects.", "")
     return message, df.to_dict('records')

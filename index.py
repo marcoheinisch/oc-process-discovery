@@ -5,7 +5,6 @@ from environment.settings import APP_HOST, APP_PORT, APP_DEBUG, DEV_TOOLS_PROPS_
 # import callback functions
 from routes import render_page_content
 
-from pages.dms.dms_callbacks import *
 from pages.analyse.analyse_callbacks import *
 from layout.sidebar.sidebar_callbacks import *
 
