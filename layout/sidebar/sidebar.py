@@ -45,7 +45,7 @@ sidebar = html.Div(
                     }
                 ),
                 html.P(
-                    "A web tool used to upload or extract object-centic events from SAP and analyse them.",
+                    "A web tool used to upload or extract object-centric events from SAP and analyse them.",
                     className="lead",
                 ),
             ],
