@@ -13,7 +13,7 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 def get_redme_markdown():
     markdown_content = open('README.md', 'r').read()
-    from_chapter= "# Setup"
+    from_chapter= "# Quick setup"
     to_chapter = "# Usage"
     
     match = re.search(
