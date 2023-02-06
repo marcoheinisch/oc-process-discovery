@@ -1,12 +1,12 @@
-FROM python:3.9
+FROM python:3.9-slim
 
 WORKDIR /code
 
 COPY requirements.txt /
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends graphviz
-RUN pip install -r /requirements.txt --use-deprecated=legacy-resolver \
+  && apt-get install -y --no-install-recommends graphviz \
+  && pip install -r /requirements.txt --use-deprecated=legacy-resolver \
 	&& rm -rf /root/.cache
 
 COPY ./ ./
