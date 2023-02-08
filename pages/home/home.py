@@ -15,6 +15,20 @@ def get_redme_markdown():
     markdown_content = open('README.md', 'r').read()
     from_chapter= "# Quick setup"
     to_chapter = "# Usage"
+       
+    markdown_content = markdown_content.replace(f"""
+- [Quick setup](#quick-setup)
+  - [Python setup](#python-setup)
+  - [Docker setup](#docker-setup)""", "")
+    
+
+    markdown_content = markdown_content.replace(
+        f"""(#further-information)""",
+        f"""(#further-information)
+- [Quick setup](#quick-setup)
+  - [Python setup](#python-setup)
+  - [Docker setup](#docker-setup)""")
+
     
     match = re.search(
         f"({from_chapter}.*?)({to_chapter})", 
